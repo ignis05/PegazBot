@@ -1,0 +1,17 @@
+{
+	"name": "pegaz-bot",
+	"version": "1.0.0",
+	"description": "\"discord bot\"",
+	"main": "bot.js",
+	"repository": "github:ignis05/PegazBot",
+	"scripts": {
+		"start": "pm2 start ecosystem.config.js",
+		"stop": "pm2 delete PegazBot",
+		"log": "pm2 log",
+		"monit": "pm2 monit"
+	},
+	"author": "\"Grzegorz Mikołajczyk\"",
+	"license": "ISC",
+	"dependencies": {
+	}
+}
