@@ -1,10 +1,15 @@
 const path = require('path')
 const Discord = require('discord.js')
 const fs = require('fs')
+const _ = require('lodash')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
+const { resolve } = require('path')
 
 // #region load config
+
 var auth
+var COURSES
+
 let authPlaceholder = {
 	token: 'bot_token_here',
 	username: 'pegaz_login',
@@ -24,8 +29,14 @@ try {
 	console.error('Auth not found: You need to paste bot auth to ./data/auth.json')
 	return
 }
+try {
+	COURSES = require('./data/pegazdownload.json')
+} catch (err) {
+	COURSES = false
+}
 // #endregion load config
 
+// #region scraper
 const scraper = new Scraper({
 	baseSiteUrl: 'https://pegaz.uj.edu.pl', //Mandatory.If your site sits in a subfolder, provide the path WITHOUT it.
 	startUrl: 'https://pegaz.uj.edu.pl/my', //Mandatory. The page from which the process begins.
@@ -40,39 +51,159 @@ const scraper = new Scraper({
 	filePath: null, //Needs to be provided only if a "downloadContent" operation is created.
 	auth: null, //Can provide basic auth credentials(no clue what sites actually use it).
 	headers: {
-		Cookie: 'MoodleSession=rs4mb10kp6ls1p0bv7nrio1ikh',
+		Cookie: 'MoodleSession=vvdk84e8hrfuj9lck0p8gmkc83',
 	}, //Provide custom headers for the requests.
 	proxy: null, //Use a proxy. Pass a full proxy URL, including the protocol and the port.
 })
+async function scrapePegaz() {
+	return new Promise((resolve, reject) => {
+		var courses = []
 
-var courses = []
+		function getPageObject(element) {
+			courses.push(element)
+		}
 
-function getPageObject(element) {
-	courses.push(element)
+		const root = new Root()
+
+		const course = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]', { name: 'course', getPageObject })
+		const title = new CollectContent('h1', { name: 'title' })
+		const tematy = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
+		const pliki = new CollectContent('ul.topics div.content .instancename', { name: 'files' })
+		const ogloszenia = new OpenLinks('div.activityinstance a.aalink', { name: 'announcements', slice: [0, 1] })
+		const ogl_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
+
+		root.addOperation(course)
+		course.addOperation(title)
+		course.addOperation(tematy)
+		course.addOperation(pliki)
+		course.addOperation(ogloszenia)
+		ogloszenia.addOperation(ogl_titles)
+
+		scraper
+			.scrape(root)
+			.then(() => {
+				for (let course of courses) {
+					course.announcements = course.announcements.data[0].data
+				}
+				console.log('downloaded data')
+				courses.sort((a, b) => a.title.localeCompare(b.title))
+				resolve(courses)
+			})
+			.catch(err => {
+				console.error(err)
+				reject(err)
+			})
+	})
 }
+// #endregion scraper
 
-const root = new Root()
-
-const course = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]', { name: 'course', getPageObject })
-const title = new CollectContent('h1', { name: 'title' })
-const tematy = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
-const pliki = new CollectContent('ul.topics div.content .instancename', { name: 'files' })
-const ogloszenia = new OpenLinks('div.activityinstance a.aalink', { name: 'announcements', slice: [0, 1] })
-const ogl_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
-
-root.addOperation(course)
-course.addOperation(title)
-course.addOperation(tematy)
-course.addOperation(pliki)
-course.addOperation(ogloszenia)
-ogloszenia.addOperation(ogl_titles)
-
-scraper.scrape(root).then(() => {
-	for (let course of courses) {
-		course.announcements = course.announcements.data[0].data
-	}
-	console.log(courses)
-	fs.writeFile('./data/pegazdownload.json', JSON.stringify(courses, null, 2), err => {
+function saveCourses() {
+	fs.writeFile('./data/pegazdownload.json', JSON.stringify(COURSES, null, 2), err => {
 		if (err) console.error(err)
 	})
+}
+
+async function compareChanges() {
+	return new Promise(async (resolve, reject) => {
+		let newCourses = await scrapePegaz().catch(err => reject(err))
+		if (!COURSES) {
+			COURSES = newCourses
+			saveCourses()
+			resolve(false)
+		} else {
+			changes = {}
+			COURSES.forEach((course, i) => {
+				newCourse = newCourses[i]
+				console.log('---------------------------')
+				console.log(course)
+				console.log(newCourse)
+				for (let key of ['topics', 'files', 'announcements']) {
+					let diff = _.difference(newCourse[key], course[key])
+					console.log('diff')
+					console.log(diff)
+					console.log('---------------------------')
+					if (diff.length == 0) continue
+					if (!changes[course.title]) changes[course.title] = {}
+					changes[course.title][key] = diff
+				}
+			})
+			COURSES = newCourses
+			saveCourses()
+			if (changes == {}) return resolve(false)
+			resolve(changes)
+		}
+	})
+}
+
+const client = new Discord.Client()
+const botOwnerID = 226032144856776704
+
+client.on('ready', () => {
+	/* client.users.fetch(botOwnerID).then(owner => {
+		owner.send('Ready!')
+	}) */
+	console.log('Ready!')
 })
+
+client.on('message', async msg => {
+	// only me
+	if (msg.author.id != botOwnerID) return
+
+	// mentioned
+	if (msg.mentions.users.find(user => user.id == client.user.id)) {
+		console.log('its me')
+		var cmd = msg.content.split(' ')[1]
+		var arg = msg.content.split(' ')
+		arg.shift()
+		arg.shift()
+		arg = arg.join(' ')
+		console.log(cmd)
+		console.log(arg)
+		switch (cmd) {
+			case 'reload':
+			case 'refreshnow':
+				if (!COURSES) {
+					COURSES = await scrapePegaz().catch(err => {
+						msg.channel.send('failed to fetch data')
+					})
+					saveCourses()
+					console.log('downloaded data first time')
+					return msg.channel.send('downloaded data for the first time')
+				}
+				let diff = await compareChanges().catch(err => {
+					msg.channel.send('failed to fetch data')
+				})
+				if (!diff || diff == {}) {
+					msg.channel.send('no differences')
+					return console.log('no differences')
+				}
+				console.log(diff)
+				msg.channel.send(JSON.stringify(diff, null, 4))
+		}
+	}
+})
+
+function intervalChanges(){
+	let channel = client.channels.fetch(764874817140555806)
+	if (!COURSES) {
+		COURSES = await scrapePegaz().catch(err => {
+			channel.send('failed to fetch data')
+		})
+		saveCourses()
+		console.log('downloaded data first time')
+		return channel.send('downloaded data for the first time')
+	}
+	let diff = await compareChanges().catch(err => {
+		channel.send('failed to fetch data')
+	})
+	if (!diff || diff == {}) {
+		return console.log('no differences')
+	}
+	console.log(diff)
+	channel.send(JSON.stringify(diff, null, 4))
+}
+
+client.setInterval(intervalChanges,900000)
+
+client.on('error', console.error)
+client.login(auth.token)

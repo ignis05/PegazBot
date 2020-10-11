@@ -1,110 +1,5 @@
 [
   {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445892",
-    "title": "Podstawy informatyki. Ćwiczenia, grupa nr 6 [WFAIS.IF-A205.0 20/21Z CW 6]Sławomir Tadeja",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445889",
-    "title": "Podstawy informatyki. Wykład, grupa nr 1 [WFAIS.IF-A205.0 20/21Z WYK 1]Katarzyna Grzesiak-Kopeć",
-    "topics": [
-      "Sekcja ogólna",
-      "Temat 1",
-      "Temat 2",
-      "Temat 3",
-      "Temat 4",
-      "Temat 5",
-      "Temat 6",
-      "Temat 7",
-      "Temat 8"
-    ],
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie",
-      "Wprowadzenie Plik",
-      "Wprowadzenie Plik",
-      "Tablice informatyczne Adres URL",
-      "Map of Computer Science Adres URL",
-      "Informacja Plik",
-      "Informacja Plik"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445882",
-    "title": "Wstęp do architektury komputerów. Ćwiczenia, grupa nr 7 [WFAIS.IF-A204.0 20/21Z CW 7]Anna Sochocka",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445881",
-    "title": "Wstęp do architektury komputerów. Wykład, grupa nr 1 [WFAIS.IF-A204.0 20/21Z WYK 1]Anna Sochocka",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445880",
-    "title": "Język C. Wykład, grupa nr 1 [WFAIS.IF-A203.0 20/21Z WYK 1]Adam Rycerz",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445878",
-    "title": "Język C. Ćwiczenia, grupa nr 2 [WFAIS.IF-A203.0 20/21Z CW 2]Adam Rycerz",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445866",
-    "title": "Logika i teoria mnogości. Ćwiczenia, grupa nr 5 [WFAIS.IF-A202.0 20/21Z CW 5]Tomasz Trześniewski",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445861",
-    "title": "Logika i teoria mnogości. Wykład, grupa nr 1 [WFAIS.IF-A202.0 20/21Z WYK 1]Andrzej Görlich",
-    "topics": [
-      "Sekcja ogólna",
-      "Kontakt",
-      "Wykłady",
-      "Zasady",
-      "Program",
-      "Zadania"
-    ],
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie",
-      "Dane kontaktowe i terminy konsultacji Adres URL",
-      "Strona wykładu na SharePoint Adres URL"
-    ],
-    "announcements": []
-  },
-  {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445426",
     "title": "Analiza matematyczna I. Ćwiczenia, grupa nr 7 [WFAIS.IF-A201.1 20/21Z CW 7]Barbara Lewandowska",
     "topics": [
@@ -144,8 +39,8 @@
     ]
   },
   {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445522",
-    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 [SWF.UJ.FITNESS 20/21Z WF 1]Małgorzata Rokowska",
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445878",
+    "title": "Język C. Ćwiczenia, grupa nr 2 [WFAIS.IF-A203.0 20/21Z CW 2]Adam Rycerz",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -154,8 +49,113 @@
     "announcements": []
   },
   {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445880",
+    "title": "Język C. Wykład, grupa nr 1 [WFAIS.IF-A203.0 20/21Z WYK 1]Adam Rycerz",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445866",
+    "title": "Logika i teoria mnogości. Ćwiczenia, grupa nr 5 [WFAIS.IF-A202.0 20/21Z CW 5]Tomasz Trześniewski",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445861",
+    "title": "Logika i teoria mnogości. Wykład, grupa nr 1 [WFAIS.IF-A202.0 20/21Z WYK 1]Andrzej Görlich",
+    "topics": [
+      "Sekcja ogólna",
+      "Kontakt",
+      "Wykłady",
+      "Zasady",
+      "Program",
+      "Zadania"
+    ],
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie",
+      "Dane kontaktowe i terminy konsultacji Adres URL",
+      "Strona wykładu na SharePoint Adres URL"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445892",
+    "title": "Podstawy informatyki. Ćwiczenia, grupa nr 6 [WFAIS.IF-A205.0 20/21Z CW 6]Sławomir Tadeja",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445889",
+    "title": "Podstawy informatyki. Wykład, grupa nr 1 [WFAIS.IF-A205.0 20/21Z WYK 1]Katarzyna Grzesiak-Kopeć",
+    "topics": [
+      "Sekcja ogólna",
+      "Temat 1",
+      "Temat 2",
+      "Temat 3",
+      "Temat 4",
+      "Temat 5",
+      "Temat 6",
+      "Temat 7",
+      "Temat 8"
+    ],
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie",
+      "Wprowadzenie Plik",
+      "Wprowadzenie Plik",
+      "Tablice informatyczne Adres URL",
+      "Map of Computer Science Adres URL",
+      "Informacja Plik",
+      "Informacja Plik"
+    ],
+    "announcements": []
+  },
+  {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=467667",
     "title": "Szkolenie BHK. Kształcenie na odległość, grupa nr 5 [BHK-stud-1 20/21Z EL 5]Barbara Bryk  Małgorzata Szczepańska",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445882",
+    "title": "Wstęp do architektury komputerów. Ćwiczenia, grupa nr 7 [WFAIS.IF-A204.0 20/21Z CW 7]Anna Sochocka",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445881",
+    "title": "Wstęp do architektury komputerów. Wykład, grupa nr 1 [WFAIS.IF-A204.0 20/21Z WYK 1]Anna Sochocka",
+    "topics": "Sekcja ogólna",
+    "files": [
+      "Ogłoszenia Forum",
+      "Forum towarzyskie"
+    ],
+    "announcements": []
+  },
+  {
+    "address": "https://pegaz.uj.edu.pl/course/view.php?id=445522",
+    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 [SWF.UJ.FITNESS 20/21Z WF 1]Małgorzata Rokowska",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
