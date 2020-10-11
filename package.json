@@ -1,7 +1,7 @@
 {
 	"name": "pegaz-bot",
 	"version": "1.0.0",
-	"description": "\"discord bot\"",
+	"description": "\"pegaz - discord bot\"",
 	"main": "bot.js",
 	"repository": "github:ignis05/PegazBot",
 	"scripts": {
@@ -13,5 +13,8 @@
 	"author": "\"Grzegorz Mikołajczyk\"",
 	"license": "ISC",
 	"dependencies": {
+		"discord.js": "^12.3.1",
+		"fs": "0.0.1-security",
+		"moodle-client": "^0.5.2"
 	}
 }
