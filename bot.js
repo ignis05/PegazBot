@@ -52,17 +52,27 @@ function getPageObject(element) {
 }
 
 const root = new Root()
-// const getcourses = new CollectContent('a.aalink.coursename', { name: 'title', getPageObject })
-// root.addOperation(getcourses)
 
 const course = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]', { name: 'course', getPageObject })
 const title = new CollectContent('h1', { name: 'title' })
-const ogloszenia = new CollectContent('ul.topics div.content', { name: 'topics'})
+const tematy = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
+const pliki = new CollectContent('ul.topics div.content .instancename', { name: 'files' })
+const ogloszenia = new OpenLinks('div.activityinstance a.aalink', { name: 'announcements', slice: [0, 1] })
+const ogl_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
 
 root.addOperation(course)
 course.addOperation(title)
+course.addOperation(tematy)
+course.addOperation(pliki)
 course.addOperation(ogloszenia)
+ogloszenia.addOperation(ogl_titles)
 
 scraper.scrape(root).then(() => {
+	for (let course of courses) {
+		course.announcements = course.announcements.data[0].data
+	}
 	console.log(courses)
+	fs.writeFile('./data/pegazdownload.json', JSON.stringify(courses, null, 2), err => {
+		if (err) console.error(err)
+	})
 })
