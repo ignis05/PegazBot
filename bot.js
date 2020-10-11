@@ -4,6 +4,7 @@ const fs = require('fs')
 const _ = require('lodash')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
 const { resolve } = require('path')
+const { isEmpty } = require('lodash')
 
 // #region load config
 
@@ -114,14 +115,14 @@ async function compareChanges() {
 			changes = {}
 			COURSES.forEach((course, i) => {
 				newCourse = newCourses[i]
-				console.log('---------------------------')
-				console.log(course)
-				console.log(newCourse)
+				// console.log('---------------------------')
+				// console.log(course)
+				// console.log(newCourse)
 				for (let key of ['topics', 'files', 'announcements']) {
 					let diff = _.difference(newCourse[key], course[key])
-					console.log('diff')
-					console.log(diff)
-					console.log('---------------------------')
+					// console.log('diff')
+					// console.log(diff)
+					// console.log('---------------------------')
 					if (diff.length == 0) continue
 					if (!changes[course.title]) changes[course.title] = {}
 					changes[course.title][key] = diff
@@ -129,19 +130,19 @@ async function compareChanges() {
 			})
 			COURSES = newCourses
 			saveCourses()
-			if (changes == {}) return resolve(false)
+			if (_.isEmpty(changes)) return resolve(false)
 			resolve(changes)
 		}
 	})
 }
 
 const client = new Discord.Client()
-const botOwnerID = 226032144856776704
+const botOwnerID = '226032144856776704'
 
 client.on('ready', () => {
-	/* client.users.fetch(botOwnerID).then(owner => {
+	client.users.fetch(botOwnerID).then(owner => {
 		owner.send('Ready!')
-	}) */
+	})
 	console.log('Ready!')
 })
 
@@ -173,7 +174,7 @@ client.on('message', async msg => {
 				let diff = await compareChanges().catch(err => {
 					msg.channel.send('failed to fetch data')
 				})
-				if (!diff || diff == {}) {
+				if (!diff || _.isEmpty(diff)) {
 					msg.channel.send('no differences')
 					return console.log('no differences')
 				}
@@ -185,7 +186,7 @@ client.on('message', async msg => {
 
 async function intervalChanges() {
 	console.log(`running check at ${new Date()}`)
-	let channel = client.channels.fetch(764874817140555806)
+	let channel = await client.channels.fetch('764874817140555806')
 	if (!COURSES) {
 		COURSES = await scrapePegaz().catch(err => {
 			channel.send('failed to fetch data')
@@ -197,7 +198,7 @@ async function intervalChanges() {
 	let diff = await compareChanges().catch(err => {
 		channel.send('failed to fetch data')
 	})
-	if (!diff || diff == {}) {
+	if (!diff || _.isEmpty(diff)) {
 		return console.log('no differences')
 	}
 	console.log(diff)
