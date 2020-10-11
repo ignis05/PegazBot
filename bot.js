@@ -183,7 +183,8 @@ client.on('message', async msg => {
 	}
 })
 
-function intervalChanges(){
+async function intervalChanges() {
+	console.log(`running check at ${new Date()}`)
 	let channel = client.channels.fetch(764874817140555806)
 	if (!COURSES) {
 		COURSES = await scrapePegaz().catch(err => {
@@ -203,7 +204,7 @@ function intervalChanges(){
 	channel.send(JSON.stringify(diff, null, 4))
 }
 
-client.setInterval(intervalChanges,900000)
+client.setInterval(intervalChanges, 900000)
 
 client.on('error', console.error)
 client.login(auth.token)
