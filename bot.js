@@ -5,6 +5,9 @@ const _ = require('lodash')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
 const { resolve } = require('path')
 const { isEmpty } = require('lodash')
+const { exit } = require('process')
+
+const botOwnerID = '226032144856776704'
 
 // #region load config
 
@@ -12,14 +15,13 @@ var auth
 var COURSES
 
 let authPlaceholder = {
-	token: 'bot_token_here',
-	username: 'pegaz_login',
-	passwd: 'pegaz_password',
+	token: 'Discord bot token',
+	MoodleSession: 'MoodleSession cookie copied from browser',
 }
 try {
 	auth = require('./data/auth.json')
 	if (auth == authPlaceholder) {
-		console.error('Auth is a placeholder: You add auth info to ./data/auth.json')
+		console.error('Auth is a placeholder: You need to add auth info to ./data/auth.json')
 		return
 	}
 } catch (err) {
@@ -28,7 +30,7 @@ try {
 	}
 	fs.writeFileSync('./data/auth.json', JSON.stringify(authPlaceholder, null, 2))
 	console.error('Auth not found: You need to paste bot auth to ./data/auth.json')
-	return
+	exit(0)
 }
 try {
 	COURSES = require('./data/pegazdownload.json')
@@ -38,24 +40,28 @@ try {
 // #endregion load config
 
 // #region scraper
-const scraper = new Scraper({
-	baseSiteUrl: 'https://pegaz.uj.edu.pl', //Mandatory.If your site sits in a subfolder, provide the path WITHOUT it.
-	startUrl: 'https://pegaz.uj.edu.pl/my', //Mandatory. The page from which the process begins.
-	logPath: './logs', //Highly recommended.Will create a log for each scraping operation(object).
-	cloneImages: true, //If an image with the same name exists, a new file with a number appended to it is created. Otherwise. it's overwritten.
-	showConsoleLogs: false, //Whether to show or hide messages.
-	removeStyleAndScriptTags: true, // Removes any <style> and <script> tags found on the page, in order to serve Cheerio with a light-weight string. change this ONLY if you have to.
-	concurrency: 3, //Maximum concurrent requests.Highly recommended to keep it at 10 at most.
-	maxRetries: 5, //Maximum number of retries of a failed request.
-	delay: 200,
-	timeout: 6000,
-	filePath: null, //Needs to be provided only if a "downloadContent" operation is created.
-	auth: null, //Can provide basic auth credentials(no clue what sites actually use it).
-	headers: {
-		Cookie: 'MoodleSession=vvdk84e8hrfuj9lck0p8gmkc83',
-	}, //Provide custom headers for the requests.
-	proxy: null, //Use a proxy. Pass a full proxy URL, including the protocol and the port.
-})
+var scraper
+function createScraper(moodle_cookie) {
+	return new Scraper({
+		baseSiteUrl: 'https://pegaz.uj.edu.pl', //Mandatory.If your site sits in a subfolder, provide the path WITHOUT it.
+		startUrl: 'https://pegaz.uj.edu.pl/my', //Mandatory. The page from which the process begins.
+		logPath: './logs', //Highly recommended.Will create a log for each scraping operation(object).
+		cloneImages: true, //If an image with the same name exists, a new file with a number appended to it is created. Otherwise. it's overwritten.
+		showConsoleLogs: false, //Whether to show or hide messages.
+		removeStyleAndScriptTags: true, // Removes any <style> and <script> tags found on the page, in order to serve Cheerio with a light-weight string. change this ONLY if you have to.
+		concurrency: 3, //Maximum concurrent requests.Highly recommended to keep it at 10 at most.
+		maxRetries: 1, //Maximum number of retries of a failed request.
+		delay: 200,
+		timeout: 6000,
+		filePath: null, //Needs to be provided only if a "downloadContent" operation is created.
+		auth: null, //Can provide basic auth credentials(no clue what sites actually use it).
+		headers: {
+			Cookie: 'MoodleSession=' + moodle_cookie,
+		}, //Provide custom headers for the requests.
+		proxy: null, //Use a proxy. Pass a full proxy URL, including the protocol and the port.
+	})
+}
+var scraper = createScraper(auth.MoodleSession)
 async function scrapePegaz() {
 	return new Promise((resolve, reject) => {
 		var courses = []
@@ -80,6 +86,8 @@ async function scrapePegaz() {
 		course.addOperation(ogloszenia)
 		ogloszenia.addOperation(ogl_titles)
 
+		console.log('started scraping')
+
 		scraper
 			.scrape(root)
 			.then(() => {
@@ -88,6 +96,7 @@ async function scrapePegaz() {
 				}
 				console.log('downloaded data')
 				courses.sort((a, b) => a.title.localeCompare(b.title))
+				console.log('download successfull')
 				resolve(courses)
 			})
 			.catch(err => {
@@ -98,46 +107,84 @@ async function scrapePegaz() {
 }
 // #endregion scraper
 
+// #region discord
 function saveCourses() {
 	fs.writeFile('./data/pegazdownload.json', JSON.stringify(COURSES, null, 2), err => {
 		if (err) console.error(err)
 	})
 }
 
-async function compareChanges() {
-	return new Promise(async (resolve, reject) => {
-		let newCourses = await scrapePegaz().catch(err => reject(err))
-		if (!COURSES) {
-			COURSES = newCourses
-			saveCourses()
-			resolve(false)
-		} else {
-			changes = {}
-			COURSES.forEach((course, i) => {
-				newCourse = newCourses[i]
+function compareChanges(newCourses) {
+	if (!newCourses || _.isEmpty(newCourses)) {
+		return {}
+	} else {
+		changes = {}
+		COURSES.forEach((course, i) => {
+			newCourse = newCourses.find(c => c.title == course.title)
+			console.log('---------------------------')
+			console.log(course)
+			console.log(newCourse)
+			for (let key of ['topics', 'files', 'announcements']) {
+				let diff = _.difference(newCourse[key], course[key])
+				// console.log('diff')
+				// console.log(diff)
 				// console.log('---------------------------')
-				// console.log(course)
-				// console.log(newCourse)
-				for (let key of ['topics', 'files', 'announcements']) {
-					let diff = _.difference(newCourse[key], course[key])
-					// console.log('diff')
-					// console.log(diff)
-					// console.log('---------------------------')
-					if (diff.length == 0) continue
-					if (!changes[course.title]) changes[course.title] = {}
-					changes[course.title][key] = diff
-				}
-			})
-			COURSES = newCourses
-			saveCourses()
-			if (_.isEmpty(changes)) return resolve(false)
-			resolve(changes)
-		}
-	})
+				if (diff.length == 0) continue
+				if (!changes[course.title]) changes[course.title] = {}
+				changes[course.title][key] = diff
+			}
+		})
+		COURSES = newCourses
+		saveCourses()
+		if (_.isEmpty(changes)) return {}
+		return changes
+	}
+}
+
+async function reportChanges(channel, verbose = false) {
+	if (!COURSES) {
+		COURSES = await scrapePegaz().catch(err => {
+			channel.send('failed to fetch data')
+		})
+		saveCourses()
+		console.log('downloaded data first time')
+		return channel.send('downloaded data for the first time')
+	}
+
+	var newCourses
+	try {
+		newCourses = await scrapePegaz()
+	} catch (err) {
+		return channel.send('failed to fetch data')
+	}
+	if (!newCourses) return
+
+	// diff compare
+	let diff = compareChanges()
+	if (!diff || _.isEmpty(diff)) {
+		if (verbose) channel.send('no differences')
+		return console.log('no differences')
+	}
+	console.log(diff)
+	channel.send(JSON.stringify(diff, null, 4))
+
+	// check if all courses are there
+	let newNames = newCourses.map(c => c.title)
+	let names = COURSES.map(c => c.title)
+	let added = _.difference(newNames, names)
+	let deleted = _.difference(names, newNames)
+	if (!_.isEmpty(added)) {
+		channel.send(`New course(s) found:\n${added}`)
+	}
+	if (!_.isEmpty(deleted)) {
+		channel.send(`Some courses were not accessible and were removed:\n${deleted}`)
+	}
+
+	COURSES = newCourses
+	saveCourses()
 }
 
 const client = new Discord.Client()
-const botOwnerID = '226032144856776704'
 
 client.on('ready', () => {
 	client.users.fetch(botOwnerID).then(owner => {
@@ -153,33 +200,35 @@ client.on('message', async msg => {
 	// mentioned
 	if (msg.mentions.users.find(user => user.id == client.user.id)) {
 		console.log('its me')
-		var cmd = msg.content.split(' ')[1]
-		var arg = msg.content.split(' ')
+		var cmd = msg.content.trim().split(' ')[1].toLowerCase()
+		var arg = msg.content.trim().split(' ')
 		arg.shift()
 		arg.shift()
 		arg = arg.join(' ')
 		console.log(cmd)
 		console.log(arg)
 		switch (cmd) {
+			case 'ping':
+				console.log('pong!')
+				msg.reply(`Pong! (${Date.now() - msg.createdTimestamp}ms)`)
 			case 'reload':
+			case 'refresh':
 			case 'refreshnow':
-				if (!COURSES) {
-					COURSES = await scrapePegaz().catch(err => {
-						msg.channel.send('failed to fetch data')
-					})
-					saveCourses()
-					console.log('downloaded data first time')
-					return msg.channel.send('downloaded data for the first time')
-				}
-				let diff = await compareChanges().catch(err => {
-					msg.channel.send('failed to fetch data')
+			case 'check':
+			case 'checknow':
+				reportChanges(msg.channel, true)
+				break
+			case 'token':
+			case 'cookie':
+			case 'updatecookie':
+			case 'updatetoken':
+				auth.MoodleSession = arg.trim()
+				fs.writeFile('./data/auth.json', JSON.stringify(auth, null, 2), err => {
+					if (err) console.error(err)
 				})
-				if (!diff || _.isEmpty(diff)) {
-					msg.channel.send('no differences')
-					return console.log('no differences')
-				}
-				console.log(diff)
-				msg.channel.send(JSON.stringify(diff, null, 4))
+				scraper = createScraper(auth.MoodleSession)
+				msg.channel.send('Updated moodle authentication token succesfully.')
+				break
 		}
 	}
 })
@@ -187,25 +236,11 @@ client.on('message', async msg => {
 async function intervalChanges() {
 	console.log(`running check at ${new Date()}`)
 	let channel = await client.channels.fetch('764874817140555806')
-	if (!COURSES) {
-		COURSES = await scrapePegaz().catch(err => {
-			channel.send('failed to fetch data')
-		})
-		saveCourses()
-		console.log('downloaded data first time')
-		return channel.send('downloaded data for the first time')
-	}
-	let diff = await compareChanges().catch(err => {
-		channel.send('failed to fetch data')
-	})
-	if (!diff || _.isEmpty(diff)) {
-		return console.log('no differences')
-	}
-	console.log(diff)
-	channel.send(JSON.stringify(diff, null, 4))
+	reportChanges(channel)
 }
 
 client.setInterval(intervalChanges, 900000)
 
 client.on('error', console.error)
 client.login(auth.token)
+// #endregion discord

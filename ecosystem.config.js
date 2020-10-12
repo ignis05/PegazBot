@@ -8,7 +8,7 @@ module.exports = {
 			args: 'one two',
 			instances: 1,
 			autorestart: true,
-			watch: ['bot.js', './data/auth.json'],
+			watch: ['bot.js'],
 			max_memory_restart: '1G',
 			env: {
 				NODE_ENV: 'development',
