@@ -7,8 +7,6 @@ const { resolve } = require('path')
 const { isEmpty } = require('lodash')
 const { exit } = require('process')
 
-const botOwnerID = '226032144856776704'
-
 // #region load config
 
 var auth
@@ -37,6 +35,8 @@ try {
 } catch (err) {
 	COURSES = false
 }
+
+var { botOwnerID, channelID } = require('./data/config.json')
 // #endregion load config
 
 // #region scraper
@@ -179,7 +179,7 @@ async function reportChanges(channel, verbose = false) {
 		let outStr = ''
 		for (let [key, value] of Object.entries(obj)) {
 			if (!prettyKeys[key]) continue
-			outStr += `** [] ${prettyKeys[key]}:**\n`
+			outStr += `**> ${prettyKeys[key]}:**\n`
 			for (let item of value) {
 				outStr += `- ${item}\n`
 			}
@@ -272,13 +272,25 @@ client.on('message', async msg => {
 				scraper = createScraper(auth.MoodleSession)
 				msg.channel.send('Updated moodle authentication token succesfully.')
 				break
+			case 'channel':
+			case 'setchannel':
+			case 'updatechannel':
+				if (channelID == msg.channel.id) {
+					return msg.channel.send('This channel is already selected')
+				}
+				channelID = msg.channel.id
+				fs.writeFile('./data/config.json', JSON.stringify({ channelID, botOwnerID }, null, 2), err => {
+					if (err) console.error(err)
+				})
+				msg.reply('Updated channel')
+				break
 		}
 	}
 })
 
 async function intervalChanges() {
 	console.log(`running check at ${new Date()}`)
-	let channel = await client.channels.fetch('764874817140555806')
+	let channel = await client.channels.fetch(channelID)
 	reportChanges(channel)
 }
 
