@@ -121,9 +121,10 @@ function compareChanges(newCourses) {
 		changes = {}
 		COURSES.forEach((course, i) => {
 			newCourse = newCourses.find(c => c.title == course.title)
-			console.log('---------------------------')
-			console.log(course)
-			console.log(newCourse)
+			if (!newCourse) return
+			// console.log('---------------------------')
+			// console.log(course)
+			// console.log(newCourse)
 			for (let key of ['topics', 'files', 'announcements']) {
 				let diff = _.difference(newCourse[key], course[key])
 				// console.log('diff')
@@ -160,13 +161,54 @@ async function reportChanges(channel, verbose = false) {
 	if (!newCourses) return
 
 	// diff compare
-	let diff = compareChanges()
+	let diff = compareChanges(newCourses)
 	if (!diff || _.isEmpty(diff)) {
 		if (verbose) channel.send('no differences')
 		return console.log('no differences')
 	}
+
 	console.log(diff)
-	channel.send(JSON.stringify(diff, null, 4))
+
+	// #region embed
+	var formatVal = obj => {
+		let prettyKeys = {
+			topics: 'Tematy',
+			files: 'Pliki',
+			announcements: 'Ogłoszenia',
+		}
+		let outStr = ''
+		for (let [key, value] of Object.entries(obj)) {
+			if (!prettyKeys[key]) continue
+			outStr += `** [] ${prettyKeys[key]}:**\n`
+			for (let item of value) {
+				outStr += `- ${item}\n`
+			}
+		}
+
+		return outStr
+	}
+
+	let fields = []
+	for (let [key, item] of Object.entries(diff)) {
+		fields.push({ name: key.split('[')[0], value: formatVal(item) })
+	}
+
+	console.log(fields)
+
+	const embed = new Discord.MessageEmbed().setColor('#0099ff').setTitle('New Pegaz Content').setURL('https://pegaz.uj.edu.pl/').addFields(fields).setTimestamp()
+	// #endregion embed
+
+	if (channel.guild) {
+		if (!channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
+			// remove channel from list
+		} else if (channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
+			channel.send(embed)
+		} else {
+			channel.send(JSON.stringify(diff, null, 4))
+		}
+	} else {
+		channel.send(embed)
+	}
 
 	// check if all courses are there
 	let newNames = newCourses.map(c => c.title)
@@ -216,6 +258,7 @@ client.on('message', async msg => {
 			case 'refreshnow':
 			case 'check':
 			case 'checknow':
+			case 'update':
 				reportChanges(msg.channel, true)
 				break
 			case 'token':

@@ -16,6 +16,7 @@
       "Zadania na zajęcia Plik",
       "Zadania dodatkowe Plik",
       "Zadania Głosowanie",
+      "Obecność Głosowanie",
       "Zadania  Głosowanie"
     ],
     "announcements": []
@@ -34,6 +35,7 @@
       "Notatki do wykładu (aktualizacja 5.10.2020) Plik"
     ],
     "announcements": [
+      "Spotkanie informacyjne",
       "Notatki do wykładu",
       "Tryb zajęć"
     ]
@@ -120,16 +122,6 @@
       "Map of Computer Science Adres URL",
       "Informacja Plik",
       "Informacja Plik"
-    ],
-    "announcements": []
-  },
-  {
-    "address": "https://pegaz.uj.edu.pl/course/view.php?id=467667",
-    "title": "Szkolenie BHK. Kształcenie na odległość, grupa nr 5 [BHK-stud-1 20/21Z EL 5]Barbara Bryk  Małgorzata Szczepańska",
-    "topics": "Sekcja ogólna",
-    "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
     ],
     "announcements": []
   },
