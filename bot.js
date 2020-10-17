@@ -122,21 +122,21 @@ function compareChanges(newCourses) {
 		COURSES.forEach((course, i) => {
 			newCourse = newCourses.find(c => c.title == course.title)
 			if (!newCourse) return
-			// console.log('---------------------------')
-			// console.log(course)
-			// console.log(newCourse)
+			console.log('---------------------------')
+			console.log(course)
+			console.log(newCourse)
 			for (let key of ['topics', 'files', 'announcements']) {
-				let diff = _.difference(newCourse[key], course[key])
-				// console.log('diff')
-				// console.log(diff)
-				// console.log('---------------------------')
+				let diff = new Array(..._.clone(newCourse[key]))
+				console.log(diff)
+				for (let el of course[key]) {
+					let ind = diff.indexOf(el)
+					if (ind !== -1) diff.splice(ind, 1)
+				}
 				if (diff.length == 0) continue
 				if (!changes[course.title]) changes[course.title] = {}
 				changes[course.title][key] = diff
 			}
 		})
-		COURSES = newCourses
-		saveCourses()
 		if (_.isEmpty(changes)) return {}
 		return changes
 	}
@@ -162,12 +162,11 @@ async function reportChanges(channel, verbose = false) {
 
 	// diff compare
 	let diff = compareChanges(newCourses)
+	console.log(diff)
 	if (!diff || _.isEmpty(diff)) {
 		if (verbose) channel.send('no differences')
 		return console.log('no differences')
 	}
-
-	console.log(diff)
 
 	// #region embed
 	var formatVal = obj => {
@@ -179,7 +178,7 @@ async function reportChanges(channel, verbose = false) {
 		let outStr = ''
 		for (let [key, value] of Object.entries(obj)) {
 			if (!prettyKeys[key]) continue
-			outStr += `**> ${prettyKeys[key]}:**\n`
+			outStr += `**= ${prettyKeys[key]}:**\n`
 			for (let item of value) {
 				outStr += `- ${item}\n`
 			}
