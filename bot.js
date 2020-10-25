@@ -122,12 +122,12 @@ function compareChanges(newCourses) {
 		COURSES.forEach((course, i) => {
 			newCourse = newCourses.find(c => c.title == course.title)
 			if (!newCourse) return
-			console.log('---------------------------')
-			console.log(course)
-			console.log(newCourse)
+			// console.log('---------------------------')
+			// console.log(course)
+			// console.log(newCourse)
 			for (let key of ['topics', 'files', 'announcements']) {
 				let diff = new Array(..._.clone(newCourse[key]))
-				console.log(diff)
+				// console.log(diff)
 				for (let el of course[key]) {
 					let ind = diff.indexOf(el)
 					if (ind !== -1) diff.splice(ind, 1)
@@ -162,7 +162,7 @@ async function reportChanges(channel, verbose = false) {
 
 	// diff compare
 	let diff = compareChanges(newCourses)
-	console.log(diff)
+	// console.log(diff)
 	if (!diff || _.isEmpty(diff)) {
 		if (verbose) channel.send('no differences')
 		return console.log('no differences')
@@ -192,7 +192,7 @@ async function reportChanges(channel, verbose = false) {
 		fields.push({ name: key.split('[')[0], value: formatVal(item) })
 	}
 
-	console.log(fields)
+	// console.log(fields)
 
 	const embed = new Discord.MessageEmbed().setColor('#0099ff').setTitle('New Pegaz Content').setURL('https://pegaz.uj.edu.pl/').addFields(fields).setTimestamp()
 	// #endregion embed
