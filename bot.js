@@ -73,7 +73,7 @@ async function scrapePegaz() {
 		const root = new Root()
 
 		const course = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]', { name: 'course', getPageObject })
-		const title = new CollectContent('h1', { name: 'title' })
+		const title = new CollectContent('header#page-header h1', { name: 'title' })
 		const tematy = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
 		const pliki = new CollectContent('ul.topics div.content .instancename', { name: 'files' })
 		const ogloszenia = new OpenLinks('div.activityinstance a.aalink', { name: 'announcements', slice: [0, 1] })
@@ -92,6 +92,9 @@ async function scrapePegaz() {
 			.scrape(root)
 			.then(() => {
 				for (let course of courses) {
+					/* console.log(course.title)
+					console.log(course.address)
+					console.log('------------------------') */
 					course.announcements = course.announcements.data[0].data
 				}
 				console.log('downloaded data')
@@ -160,12 +163,40 @@ async function reportChanges(channel, verbose = false) {
 	}
 	if (!newCourses) return
 
+	// check if all courses are there
+	// console.log('new courses check')
+	let newNames = newCourses.map(c => c.title)
+	let names = COURSES.map(c => c.title)
+	// console.log(names)
+	// console.log(newNames)
+	let added = _.difference(newNames, names)
+	let deleted = _.difference(names, newNames)
+	// console.log(added)
+	// console.log(deleted)
+	var addedOrDeleted = false
+	if (!_.isEmpty(added)) {
+		let str = added.toString().slice(0, 1900)
+		channel.send(`New course(s) found:\n${str}`)
+		addedOrDeleted = true
+	}
+	if (!_.isEmpty(deleted)) {
+		let str = deleted.toString().slice(0, 1900)
+		addedOrDeleted = true
+		channel.send(`Some courses were not accessible and were removed:\n${str}`)
+	}
+
 	// diff compare
 	let diff = compareChanges(newCourses)
-	// console.log(diff)
 	if (!diff || _.isEmpty(diff)) {
-		if (verbose) channel.send('no differences')
-		return console.log('no differences')
+		if (addedOrDeleted) {
+			COURSES = newCourses
+			console.log('added or deleted')
+			saveCourses()
+			return
+		} else {
+			if (verbose) channel.send('no differences')
+			return console.log('no differences')
+		}
 	}
 
 	// #region embed
@@ -207,18 +238,6 @@ async function reportChanges(channel, verbose = false) {
 		}
 	} else {
 		channel.send(embed)
-	}
-
-	// check if all courses are there
-	let newNames = newCourses.map(c => c.title)
-	let names = COURSES.map(c => c.title)
-	let added = _.difference(newNames, names)
-	let deleted = _.difference(names, newNames)
-	if (!_.isEmpty(added)) {
-		channel.send(`New course(s) found:\n${added}`)
-	}
-	if (!_.isEmpty(deleted)) {
-		channel.send(`Some courses were not accessible and were removed:\n${deleted}`)
 	}
 
 	COURSES = newCourses
