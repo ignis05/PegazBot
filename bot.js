@@ -175,12 +175,12 @@ async function reportChanges(channel, verbose = false) {
 	// console.log(deleted)
 	var addedOrDeleted = false
 	if (!_.isEmpty(added)) {
-		let str = added.toString().slice(0, 1900)
+		let str = added.join('\n').slice(0, 1900)
 		channel.send(`New course(s) found:\n${str}`)
 		addedOrDeleted = true
 	}
 	if (!_.isEmpty(deleted)) {
-		let str = deleted.toString().slice(0, 1900)
+		let str = deleted.join('\n').slice(0, 1900)
 		addedOrDeleted = true
 		channel.send(`Some courses were not accessible and were removed:\n${str}`)
 	}
