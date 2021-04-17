@@ -62,6 +62,10 @@ function createScraper(moodle_cookie) {
 	})
 }
 var scraper = createScraper(auth.MoodleSession)
+/**
+ * Runs webscraper to get courses data
+ * @returns {Promise<Array>} Promise object with an array of courses
+ */
 async function scrapePegaz() {
 	return new Promise((resolve, reject) => {
 		var courses = []
@@ -111,6 +115,9 @@ async function scrapePegaz() {
 // #endregion scraper
 
 // #region discord
+/**
+ * Saves COURSES to pegazdownload.json
+ */
 function saveCourses() {
 	fs.writeFile('./data/pegazdownload.json', JSON.stringify(COURSES, null, 2), err => {
 		if (err) console.error(err)
@@ -161,7 +168,7 @@ async function reportChanges(channel, verbose = false) {
 	} catch (err) {
 		return channel.send('failed to fetch data')
 	}
-	if (!newCourses) return
+	if (!newCourses || _.isEmpty(newCourses)) return channel.send('failed to fetch data')
 
 	// check if all courses are there
 	// console.log('new courses check')

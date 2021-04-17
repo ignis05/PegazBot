@@ -1,7 +1,7 @@
 [
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=471311",
-    "title": "Algebra z geometrią MS. Ćwiczenia, grupa nr 1 WFAIS.IF-M005.1 20/21L CW 1",
+    "title": "Algebra z geometrią MS. Ćwiczenia, grupa nr 1 [WFAIS.IF-M005.1 20/21L CW 1]Łucja Dzidek",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -11,7 +11,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=471312",
-    "title": "Algebra z geometrią MS. Wykład, grupa nr 1 WFAIS.IF-M005.1 20/21L WYK 1Marek Kutschera",
+    "title": "Algebra z geometrią MS. Wykład, grupa nr 1 [WFAIS.IF-M005.1 20/21L WYK 1]Marek Kutschera",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -21,7 +21,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445426",
-    "title": "Analiza matematyczna I. Ćwiczenia, grupa nr 7 WFAIS.IF-A201.1 20/21Z CW 7Barbara Lewandowska",
+    "title": "Analiza matematyczna I. Ćwiczenia, grupa nr 7 [WFAIS.IF-A201.1 20/21Z CW 7]Barbara Lewandowska",
     "topics": [
       "Sekcja ogólna",
       "Zasady prowadzenia zajęć i  zliczenia przedmiotu",
@@ -74,7 +74,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445425",
-    "title": "Analiza matematyczna I. Wykład, grupa nr 1 WFAIS.IF-A201.1 20/21Z WYK 1Alicja Skiba",
+    "title": "Analiza matematyczna I. Wykład, grupa nr 1 [WFAIS.IF-A201.1 20/21Z WYK 1]Alicja Skiba",
     "topics": [
       "Sekcja ogólna",
       "Temat 1",
@@ -117,27 +117,52 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=471288",
-    "title": "Analiza matematyczna II. Ćwiczenia, grupa nr 6 WFAIS.IF-A201.2 20/21L CW 6Barbara Lewandowska",
-    "topics": "Sekcja ogólna",
+    "title": "Analiza matematyczna II. Ćwiczenia, grupa nr 6 [WFAIS.IF-A201.2 20/21L CW 6]Barbara Lewandowska",
+    "topics": [
+      "Sekcja ogólna",
+      "Kod zespołu",
+      "Listy zadaniowe",
+      "Kolokwium 1 (13.04)"
+    ],
     "files": [
       "Ogłoszenia Forum",
-      "Forum towarzyskie"
+      "Forum towarzyskie",
+      "Zestaw 1 Plik",
+      "Zestaw 2 Plik",
+      "Zestaw 3 Plik",
+      "Zestaw 4 Plik",
+      "Zadanie 1",
+      "Zadanie 2",
+      "Zadanie 3",
+      "Zadanie 4",
+      "Kolokwium 1 - rozwiązania (gr. 6) Plik"
     ],
     "announcements": []
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=471287",
-    "title": "Analiza matematyczna II. Wykład, grupa nr 1 WFAIS.IF-A201.2 20/21L WYK 1Alicja Skiba",
-    "topics": "Sekcja ogólna",
+    "title": "Analiza matematyczna II. Wykład, grupa nr 1 [WFAIS.IF-A201.2 20/21L WYK 1]Alicja Skiba",
+    "topics": [
+      "Sekcja ogólna",
+      "Informacje organizacyjne",
+      "Materiały dydaktyczne"
+    ],
     "files": [
       "Ogłoszenia Forum",
-      "Forum towarzyskie"
+      "Forum towarzyskie",
+      "Całka oznaczona - notatki do wykładu Plik",
+      "Całka oznaczona - przykłady Plik",
+      "NOTATKI DO WYKŁADU (aktualizacja 6.04) Plik",
+      "Propozycje zadań na egzamin. Plik"
     ],
-    "announcements": []
+    "announcements": [
+      "Spotkanie informacyjne",
+      "Pierwszy wykład"
+    ]
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=463583",
-    "title": "Filozofia. Ćwiczenia, grupa nr 5 WFAIS.IF-Z003.0 20/21L CW 5Marek Suwara",
+    "title": "Filozofia. Ćwiczenia, grupa nr 5 [WFAIS.IF-Z003.0 20/21L CW 5]Marek Suwara",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -147,17 +172,35 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=463581",
-    "title": "Filozofia. Wykład, grupa nr 1 WFAIS.IF-Z003.0 20/21L WYK 1Jan Czerniawski",
-    "topics": "Sekcja ogólna",
+    "title": "Filozofia. Wykład, grupa nr 1 [WFAIS.IF-Z003.0 20/21L WYK 1]Jan Czerniawski",
+    "topics": [
+      "Sekcja ogólna",
+      "Temat 1: Argumenty Zenona przeciw ruchowi",
+      "Temat 2: Atomizm"
+    ],
     "files": [
       "Ogłoszenia Forum",
-      "Forum towarzyskie"
+      "Forum towarzyskie",
+      "Slajdy Plik",
+      "Pytania Plik",
+      "Teksty filozoficzne Adres URL",
+      "Wykład BigBlueButton (komunikacja synchroniczna)",
+      "Antynomia a paradoks Adres URL",
+      "Lukrecjusz Plik"
     ],
-    "announcements": []
+    "announcements": [
+      "Zespół",
+      "Wprowadzenie",
+      "\"Przeludnienie\" kursu",
+      "Początki filozofii",
+      "Eleaci",
+      "Atomizm",
+      "Argumenty Zenona"
+    ]
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445878",
-    "title": "Język C. Ćwiczenia, grupa nr 2 WFAIS.IF-A203.0 20/21Z CW 2Adam Rycerz",
+    "title": "Język C. Ćwiczenia, grupa nr 2 [WFAIS.IF-A203.0 20/21Z CW 2]Adam Rycerz",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -188,7 +231,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445880",
-    "title": "Język C. Wykład, grupa nr 1 WFAIS.IF-A203.0 20/21Z WYK 1Adam Rycerz",
+    "title": "Język C. Wykład, grupa nr 1 [WFAIS.IF-A203.0 20/21Z WYK 1]Adam Rycerz",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -198,17 +241,37 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=472410",
-    "title": "Język C++. Laboratorium, grupa nr 7 WFAIS.IF-A207.0 20/21L LAB 7Witold Przygoda",
-    "topics": "Sekcja ogólna",
+    "title": "Język C++. Laboratorium, grupa nr 7 [WFAIS.IF-A207.0 20/21L LAB 7]Witold Przygoda",
+    "topics": [
+      "Sekcja ogólna",
+      "info@cpp.edu.pl - na ten adres piszemy maile",
+      "MATERIAŁY DO KURSU",
+      "#1 (3.03.2021)",
+      "#2 (10.03.2021)",
+      "#3 (17.03.2021)",
+      "#4 (24.03.2021)",
+      "#5 (31.03.2021)",
+      "#6 (7.04.2021)",
+      "#7 (14.04.2021)"
+    ],
     "files": [
-      "Ogłoszenia Forum",
-      "Forum towarzyskie"
+      "Ankieta początkowa Kwestionariusz",
+      "Slajdy Język C++ Plik",
+      "Metody pomiaru czasu Lekcja",
+      "Wprowadzenie | kompilator | środowisko Lekcja",
+      "Kompilatory C++ on-line Lekcja",
+      "Klasa std::string Plik",
+      "Zestaw zadań 1 Plik",
+      "Klasa std::string ciąg dalszy Plik",
+      "Klasa TString Plik",
+      "Zestaw zadań 2 Plik",
+      "Operatory i metody klasy TString Plik"
     ],
     "announcements": []
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445866",
-    "title": "Logika i teoria mnogości. Ćwiczenia, grupa nr 5 WFAIS.IF-A202.0 20/21Z CW 5Tomasz Trześniewski",
+    "title": "Logika i teoria mnogości. Ćwiczenia, grupa nr 5 [WFAIS.IF-A202.0 20/21Z CW 5]Tomasz Trześniewski",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -229,7 +292,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445861",
-    "title": "Logika i teoria mnogości. Wykład, grupa nr 1 WFAIS.IF-A202.0 20/21Z WYK 1Andrzej Görlich",
+    "title": "Logika i teoria mnogości. Wykład, grupa nr 1 [WFAIS.IF-A202.0 20/21Z WYK 1]Andrzej Görlich",
     "topics": [
       "Sekcja ogólna",
       "Kontakt",
@@ -249,7 +312,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=473212",
-    "title": "Matematyka dyskretna. Ćwiczenia, grupa nr 5 WFAIS.IF-A208.0 20/21L CW 5Adam Burchardt",
+    "title": "Matematyka dyskretna. Ćwiczenia, grupa nr 5 [WFAIS.IF-A208.0 20/21L CW 5]Adam Burchardt",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -259,7 +322,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=473208",
-    "title": "Matematyka dyskretna. Wykład, grupa nr 1 WFAIS.IF-A208.0 20/21L WYK 1Jakub Mielczarek",
+    "title": "Matematyka dyskretna. Wykład, grupa nr 1 [WFAIS.IF-A208.0 20/21L WYK 1]Jakub Mielczarek",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -269,7 +332,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445892",
-    "title": "Podstawy informatyki. Ćwiczenia, grupa nr 6 WFAIS.IF-A205.0 20/21Z CW 6Sławomir Tadeja",
+    "title": "Podstawy informatyki. Ćwiczenia, grupa nr 6 [WFAIS.IF-A205.0 20/21Z CW 6]Sławomir Tadeja",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -286,7 +349,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445889",
-    "title": "Podstawy informatyki. Wykład, grupa nr 1 WFAIS.IF-A205.0 20/21Z WYK 1Katarzyna Grzesiak-Kopeć",
+    "title": "Podstawy informatyki. Wykład, grupa nr 1 [WFAIS.IF-A205.0 20/21Z WYK 1]Katarzyna Grzesiak-Kopeć",
     "topics": [
       "Sekcja ogólna",
       "12.10.2020",
@@ -343,7 +406,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=469730",
-    "title": "Prawo internetu. Wykład, grupa nr 1 WFAIS.IF-A209.0 20/21L WYK 1Michał Markiewicz",
+    "title": "Prawo internetu. Wykład, grupa nr 1 [WFAIS.IF-A209.0 20/21L WYK 1]Michał Markiewicz",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -353,8 +416,16 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=473526",
-    "title": "Systemy operacyjne. Laboratorium, grupa nr 4 WFAIS.IF-A206.0 20/21L LAB 4Wiesław Płaczek",
-    "topics": "Sekcja ogólna",
+    "title": "Systemy operacyjne. Laboratorium, grupa nr 4 [WFAIS.IF-A206.0 20/21L LAB 4]Wiesław Płaczek",
+    "topics": [
+      "Sekcja ogólna",
+      "Temat 1",
+      "Temat 2",
+      "Temat 3",
+      "Temat 4",
+      "Temat 5",
+      "Ćwiczenia dodatkowe"
+    ],
     "files": [
       "Ogłoszenia Forum",
       "Forum towarzyskie",
@@ -368,24 +439,62 @@
       "A Guided Tour of Emacs Adres URL",
       "Advanced Linux Programming Adres URL",
       "NASBI - baza książek on-line Adres URL",
-      "Konsultacje na MS Teams Adres URL"
+      "Zasady i wymagania Plik",
+      "Terminal i edytor Strona",
+      "Jak wysyłać programy na platformę Pegaz Strona",
+      "Materiały do ćwiczeń: spis treści Plik",
+      "Konsultacje na MS Teams Adres URL",
+      "Środa, 14.04.2021, godz. 10:15 BigBlueButton (komunikacja synchroniczna)",
+      "Czat do komunikacji na wypadek problemów z BBB lub MS Teams",
+      "Rezerwa na MS Teams - kanał prywatny: Ćwiczenia, grupa 4 Adres URL",
+      "Podstawy Linuksa Plik",
+      "Test z podstaw Linuksa Test (Quiz)",
+      "StartSO.tar.gz Plik",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 1 Zadanie",
+      "Ćwiczenie 2 Zadanie",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 3 Zadanie",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 4 Zadanie",
+      "Ćwiczenie 5 Zadanie",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 6 Zadanie",
+      "Materiały do ćwiczeń Plik"
     ],
     "announcements": []
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=473522",
-    "title": "Systemy operacyjne. Wykład, grupa nr 1 WFAIS.IF-A206.0 20/21L WYK 1Wiesław Płaczek",
-    "topics": "Sekcja ogólna",
+    "title": "Systemy operacyjne. Wykład, grupa nr 1 [WFAIS.IF-A206.0 20/21L WYK 1]Wiesław Płaczek",
+    "topics": [
+      "Sekcja ogólna",
+      "Temat 1",
+      "Temat 2",
+      "Temat 3",
+      "Temat 4",
+      "Temat 5",
+      "Temat 6"
+    ],
     "files": [
       "Ogłoszenia Forum",
       "Forum towarzyskie",
-      "Systemy operacyjne - strona główna Adres URL"
+      "Systemy operacyjne - strona główna Adres URL",
+      "Konsultacje na MS Teams Adres URL",
+      "Wykład zdalny na MS Teams - kanał \"Ogólny\" Adres URL",
+      "Czat do kumunikacji na wypadek problemów z MS Teams",
+      "Wykład 1 Plik",
+      "Wykład 2 Plik",
+      "Wykład 3 Plik",
+      "Wykład 4 Plik",
+      "Wykład 5 Plik",
+      "Wykład 6 Plik"
     ],
     "announcements": []
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445882",
-    "title": "Wstęp do architektury komputerów. Ćwiczenia, grupa nr 7 WFAIS.IF-A204.0 20/21Z CW 7Anna Sochocka",
+    "title": "Wstęp do architektury komputerów. Ćwiczenia, grupa nr 7 [WFAIS.IF-A204.0 20/21Z CW 7]Anna Sochocka",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -395,7 +504,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445881",
-    "title": "Wstęp do architektury komputerów. Wykład, grupa nr 1 WFAIS.IF-A204.0 20/21Z WYK 1Anna Sochocka",
+    "title": "Wstęp do architektury komputerów. Wykład, grupa nr 1 [WFAIS.IF-A204.0 20/21Z WYK 1]Anna Sochocka",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -405,7 +514,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=469912",
-    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 SWF.UJ.FITNESS 20/21L WF 1Małgorzata Rokowska",
+    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 [SWF.UJ.FITNESS 20/21L WF 1]Małgorzata Rokowska",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
@@ -415,7 +524,7 @@
   },
   {
     "address": "https://pegaz.uj.edu.pl/course/view.php?id=445522",
-    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 SWF.UJ.FITNESS 20/21Z WF 1Małgorzata Rokowska",
+    "title": "Wychowanie Fizyczne. Zajęcia fizyczne, grupa nr 1 [SWF.UJ.FITNESS 20/21Z WF 1]Małgorzata Rokowska",
     "topics": "Sekcja ogólna",
     "files": [
       "Ogłoszenia Forum",
