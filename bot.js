@@ -336,9 +336,9 @@ const interactions = [
 ]
 // one time lauch - register interactions
 client.once('ready', async () => {
-	let testGuild = await client.guilds.fetch('467313439413501983')
+	// let testGuild = await client.guilds.fetch('467313439413501983')
 	for (let interaction of interactions) {
-		testGuild.commands.create(interaction)
+		// testGuild.commands.create(interaction)
 		client.application.commands.create(interaction)
 	}
 })
