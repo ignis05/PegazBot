@@ -131,6 +131,7 @@
       "Zestaw 2 Plik",
       "Zestaw 3 Plik",
       "Zestaw 4 Plik",
+      "Zestaw 5 Plik",
       "Zadanie 1",
       "Zadanie 2",
       "Zadanie 3",
@@ -145,15 +146,19 @@
     "topics": [
       "Sekcja ogólna",
       "Informacje organizacyjne",
-      "Materiały dydaktyczne"
+      "Materiały dydaktyczne",
+      "Notatki do wykładu",
+      "Wykład - komentarze do notatek rozdział 1"
     ],
     "files": [
       "Ogłoszenia Forum",
       "Forum towarzyskie",
       "Całka oznaczona - notatki do wykładu Plik",
       "Całka oznaczona - przykłady Plik",
+      "Propozycje zadań na egzamin. Plik",
       "NOTATKI DO WYKŁADU (aktualizacja 6.04) Plik",
-      "Propozycje zadań na egzamin. Plik"
+      "Rozdz.1.1 i 1.2 Plik",
+      "Rozdz.1.3,1.4i1.5 Plik"
     ],
     "announcements": [
       "Spotkanie informacyjne",
@@ -176,7 +181,8 @@
     "topics": [
       "Sekcja ogólna",
       "Temat 1: Argumenty Zenona przeciw ruchowi",
-      "Temat 2: Atomizm"
+      "Temat 2: Atomizm",
+      "Temat 3: Platonizm"
     ],
     "files": [
       "Ogłoszenia Forum",
@@ -186,13 +192,17 @@
       "Teksty filozoficzne Adres URL",
       "Wykład BigBlueButton (komunikacja synchroniczna)",
       "Antynomia a paradoks Adres URL",
-      "Lukrecjusz Plik"
+      "Lukrecjusz Plik",
+      "Platon - Jaskinia Plik",
+      "Platon - Timaios Plik",
+      "Augustyn - Wyznania Plik"
     ],
     "announcements": [
       "Zespół",
       "Wprowadzenie",
       "\"Przeludnienie\" kursu",
       "Początki filozofii",
+      "Holizm",
       "Eleaci",
       "Atomizm",
       "Argumenty Zenona"
@@ -424,6 +434,7 @@
       "Temat 3",
       "Temat 4",
       "Temat 5",
+      "Temat 6",
       "Ćwiczenia dodatkowe"
     ],
     "files": [
@@ -444,7 +455,7 @@
       "Jak wysyłać programy na platformę Pegaz Strona",
       "Materiały do ćwiczeń: spis treści Plik",
       "Konsultacje na MS Teams Adres URL",
-      "Środa, 14.04.2021, godz. 10:15 BigBlueButton (komunikacja synchroniczna)",
+      "Środa, 28.04.2021, godz. 10:15 BigBlueButton (komunikacja synchroniczna)",
       "Czat do komunikacji na wypadek problemów z BBB lub MS Teams",
       "Rezerwa na MS Teams - kanał prywatny: Ćwiczenia, grupa 4 Adres URL",
       "Podstawy Linuksa Plik",
@@ -460,6 +471,8 @@
       "Ćwiczenie 5 Zadanie",
       "Materiały do ćwiczeń Plik",
       "Ćwiczenie 6 Zadanie",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 7 Zadanie",
       "Materiały do ćwiczeń Plik"
     ],
     "announcements": []
@@ -474,7 +487,8 @@
       "Temat 3",
       "Temat 4",
       "Temat 5",
-      "Temat 6"
+      "Temat 6",
+      "Temat 7"
     ],
     "files": [
       "Ogłoszenia Forum",
@@ -488,7 +502,8 @@
       "Wykład 3 Plik",
       "Wykład 4 Plik",
       "Wykład 5 Plik",
-      "Wykład 6 Plik"
+      "Wykład 6 Plik",
+      "Wykład 7 Plik"
     ],
     "announcements": []
   },

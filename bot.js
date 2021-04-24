@@ -36,7 +36,7 @@ try {
 	COURSES = false
 }
 
-var { botOwnerID, channelID } = require('./data/config.json')
+var { botOwnerID, channelID, logChannelID } = require('./data/config.json')
 // #endregion load config
 
 // #region scraper
@@ -90,7 +90,7 @@ async function scrapePegaz() {
 		course.addOperation(ogloszenia)
 		ogloszenia.addOperation(ogl_titles)
 
-		console.log('started scraping')
+		// console.log('started scraping')
 
 		scraper
 			.scrape(root)
@@ -101,12 +101,13 @@ async function scrapePegaz() {
 					console.log('------------------------') */
 					course.announcements = course.announcements.data[0].data
 				}
-				console.log('downloaded data')
+				// console.log('downloaded data')
 				courses.sort((a, b) => a.title.localeCompare(b.title))
-				console.log('download successfull')
+				// console.log('download successfull')
 				resolve(courses)
 			})
 			.catch(err => {
+				console.log(`error running check at ${new Date()}`)
 				console.error(err)
 				reject(err)
 			})
@@ -152,78 +153,13 @@ function compareChanges(newCourses) {
 	}
 }
 
-async function reportChanges(channel, verbose = false) {
-	if (!COURSES) {
-		COURSES = await scrapePegaz().catch(err => {
-			channel.send('failed to fetch data')
-		})
-		saveCourses()
-		console.log('downloaded data first time')
-		return channel.send('downloaded data for the first time')
-	}
-
-	var newCourses
-	try {
-		newCourses = await scrapePegaz()
-	} catch (err) {
-		return channel.send('failed to fetch data')
-	}
-	if (!newCourses || _.isEmpty(newCourses)) return channel.send('failed to fetch data')
-
-	// check if all courses are there
-	// console.log('new courses check')
-	let newNames = newCourses.map(c => c.title)
-	let names = COURSES.map(c => c.title)
-	// console.log(names)
-	// console.log(newNames)
-	let added = _.difference(newNames, names)
-	let deleted = _.difference(names, newNames)
-	// console.log(added)
-	// console.log(deleted)
-	var addedOrDeleted = false
-	if (!_.isEmpty(added)) {
-		let str = added.join('\n').slice(0, 1900)
-		channel.send(`New course(s) found:\n${str}`)
-		addedOrDeleted = true
-	}
-	if (!_.isEmpty(deleted)) {
-		let str = deleted.join('\n').slice(0, 1900)
-		addedOrDeleted = true
-		channel.send(`Some courses were not accessible and were removed:\n${str}`)
-	}
-
-	// diff compare
-	let diff = compareChanges(newCourses)
-	if (!diff || _.isEmpty(diff)) {
-		if (addedOrDeleted) {
-			COURSES = newCourses
-			console.log('added or deleted')
-			saveCourses()
-			return
-		} else {
-			if (verbose) channel.send('no differences')
-			return console.log('no differences')
-		}
-	}
-
-	// #region embed
-	var formatVal = obj => {
-		let prettyKeys = {
-			topics: 'Tematy',
-			files: 'Pliki',
-			announcements: 'Ogłoszenia',
-		}
-		let outStr = ''
-		for (let [key, value] of Object.entries(obj)) {
-			if (!prettyKeys[key]) continue
-			outStr += `**= ${prettyKeys[key]}:**\n`
-			for (let item of value) {
-				outStr += `- ${item}\n`
-			}
-		}
-
-		return outStr
-	}
+/**
+ *
+ * @param {Object} output Object returned from "reportChanges" function
+ * @returns {Discord.MessageEmbed}
+ */
+function createEmbed(output) {
+	let { diff, added, deleted } = output
 
 	let fields = []
 	for (let [key, item] of Object.entries(diff)) {
@@ -233,90 +169,287 @@ async function reportChanges(channel, verbose = false) {
 	// console.log(fields)
 
 	const embed = new Discord.MessageEmbed().setColor('#0099ff').setTitle('New Pegaz Content').setURL('https://pegaz.uj.edu.pl/').addFields(fields).setTimestamp()
-	// #endregion embed
 
-	if (channel.guild) {
-		if (!channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
-			// remove channel from list
-		} else if (channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
-			channel.send(embed)
-		} else {
-			channel.send(JSON.stringify(diff, null, 4))
-		}
-	} else {
-		channel.send(embed)
-	}
+	if (added) embed.addField('---New Courses Found---', added)
 
-	COURSES = newCourses
-	saveCourses()
+	if (deleted) embed.addField('---New Courses Found---', deleted)
+
+	return embed
 }
 
-const client = new Discord.Client()
+/**
+ * Creates string from changed files object
+ * @param {Object} obj Object with changes groupped by keys
+ * @returns {String} String with formatted information
+ */
+function formatVal(obj) {
+	let prettyKeys = {
+		topics: 'Tematy',
+		files: 'Pliki',
+		announcements: 'Ogłoszenia',
+	}
+	let outStr = ''
+	for (let [key, value] of Object.entries(obj)) {
+		if (!prettyKeys[key]) continue
+		outStr += `**= ${prettyKeys[key]}:**\n`
+		for (let item of value) {
+			outStr += `- ${item}\n`
+		}
+	}
+
+	return outStr
+}
+
+/**
+ *	Runs webscraper and returns differences as object
+ * @returns {Promise} Promise with object containing detected differences
+ */
+function reportChanges() {
+	return new Promise(async (res, rej) => {
+		var output = { added: null, deleted: null, diff: null, msg: null }
+		if (!COURSES) {
+			COURSES = await scrapePegaz().catch(err => {
+				output.msg = 'failed to fetch data'
+				res(output)
+			})
+			saveCourses()
+			console.log('downloaded data first time')
+			output.msg = 'no previous data - saved current download'
+			return
+		}
+
+		var newCourses
+		try {
+			newCourses = await scrapePegaz()
+		} catch (err) {
+			output.msg = 'failed to fetch data'
+			res(output)
+			return
+		}
+		if (!newCourses || _.isEmpty(newCourses)) {
+			output.msg = 'failed to fetch data'
+			res(output)
+			return
+		}
+
+		// check if all courses are there
+		// console.log('new courses check')
+		let newNames = newCourses.map(c => c.title)
+		let names = COURSES.map(c => c.title)
+		// console.log(names)
+		// console.log(newNames)
+		let added = _.difference(newNames, names)
+		let deleted = _.difference(names, newNames)
+		// console.log(added)
+		// console.log(deleted)
+		var addedOrDeleted = false
+		if (!_.isEmpty(added)) {
+			output.added = added.join('\n').slice(0, 1900)
+			addedOrDeleted = true
+		}
+		if (!_.isEmpty(deleted)) {
+			output.deleted = deleted.join('\n').slice(0, 1900)
+			addedOrDeleted = true
+		}
+
+		// diff compare
+		let diff = compareChanges(newCourses)
+		if (!diff || _.isEmpty(diff)) {
+			if (addedOrDeleted) {
+				COURSES = newCourses
+				console.log('added or deleted')
+				saveCourses()
+				res(output)
+				return
+			} else {
+				output.msg = 'no differences'
+				res(output)
+				return
+			}
+		}
+		output.diff = diff
+
+		COURSES = newCourses
+		saveCourses()
+		res(output)
+	})
+}
+
+const intents = new Discord.Intents()
+const client = new Discord.Client({ intents })
 
 client.on('ready', () => {
 	client.users.fetch(botOwnerID).then(owner => {
 		owner.send('Ready!')
 	})
 	console.log('Ready!')
+	intervalChanges()
 })
 
-client.on('message', async msg => {
-	// only me
-	if (msg.author.id != botOwnerID) return
-
-	// mentioned
-	if (msg.mentions.users.find(user => user.id == client.user.id)) {
-		console.log('its me')
-		var cmd = msg.content.trim().split(' ')[1].toLowerCase()
-		var arg = msg.content.trim().split(' ')
-		arg.shift()
-		arg.shift()
-		arg = arg.join(' ')
-		console.log(cmd)
-		console.log(arg)
-		switch (cmd) {
-			case 'ping':
-				console.log('pong!')
-				msg.reply(`Pong! (${Date.now() - msg.createdTimestamp}ms)`)
-			case 'reload':
-			case 'refresh':
-			case 'refreshnow':
-			case 'check':
-			case 'checknow':
-			case 'update':
-				reportChanges(msg.channel, true)
-				break
-			case 'token':
-			case 'cookie':
-			case 'updatecookie':
-			case 'updatetoken':
-				auth.MoodleSession = arg.trim()
-				fs.writeFile('./data/auth.json', JSON.stringify(auth, null, 2), err => {
-					if (err) console.error(err)
-				})
-				scraper = createScraper(auth.MoodleSession)
-				msg.channel.send('Updated moodle authentication token succesfully.')
-				break
-			case 'channel':
-			case 'setchannel':
-			case 'updatechannel':
-				if (channelID == msg.channel.id) {
-					return msg.channel.send('This channel is already selected')
-				}
-				channelID = msg.channel.id
-				fs.writeFile('./data/config.json', JSON.stringify({ channelID, botOwnerID }, null, 2), err => {
-					if (err) console.error(err)
-				})
-				msg.reply('Updated channel')
-				break
-		}
+const interactions = [
+	{
+		name: 'ping',
+		description: 'Replies with pong',
+		options: [],
+	},
+	{
+		name: 'check-now',
+		description: 'Immediately runs webscraper and reports changes',
+		options: [],
+	},
+	{
+		name: 'update-token',
+		description: "Updates token used for moodle authentication. (Ephemeral reply - command won't appear in channel)",
+		options: [
+			{
+				name: 'token',
+				type: 'STRING',
+				description: 'value of MoodleSession cookie',
+				required: true,
+			},
+		],
+	},
+	{
+		name: 'set-channel',
+		description: 'Changes channel where bot sends notifications',
+		options: [
+			{
+				name: 'channel',
+				type: 'CHANNEL',
+				description: 'Text channel where notificatins will be sent',
+				required: true,
+			},
+		],
+	},
+	{
+		name: 'set-log-channel',
+		description: 'Changes channel where bot sends notifications',
+		options: [
+			{
+				name: 'channel',
+				type: 'CHANNEL',
+				description: 'Text channel where logs will be sent',
+				required: true,
+			},
+		],
+	},
+]
+// one time lauch - register interactions
+client.once('ready', async () => {
+	let testGuild = await client.guilds.fetch('467313439413501983')
+	for (let interaction of interactions) {
+		testGuild.commands.create(interaction)
+		client.application.commands.create(interaction)
 	}
 })
 
+client.on('interaction', async inter => {
+	if (!inter.isCommand()) return
+
+	switch (inter.commandName) {
+		case 'ping':
+			console.log('pong!')
+			inter.reply(`Pong! (${Date.now() - inter.createdTimestamp}ms)`)
+			break
+
+		case 'check-now':
+			inter.defer()
+			let changes = await reportChanges()
+
+			if (changes.msg) {
+				inter.editReply(changes.msg)
+				return
+			}
+
+			var embed = createEmbed(changes)
+
+			if (inter.channel.guild) {
+				if (!inter.channel.permissionsFor(inter.channel.guild.me).has('SEND_MESSAGES')) {
+				} else if (inter.channel.permissionsFor(inter.channel.guild.me).has('EMBED_LINKS')) {
+					inter.editReply(embed)
+				} else {
+					inter.editReply('failed to send message - make sure embed permissions are enabled for the bot')
+				}
+			} else {
+				inter.editReply(embed)
+			}
+			break
+		case 'update-token':
+			inter.defer()
+
+			auth.MoodleSession = inter.options[0].value
+
+			fs.writeFile('./data/auth.json', JSON.stringify(auth, null, 2), err => {
+				if (err) console.error(err)
+			})
+			scraper = createScraper(auth.MoodleSession)
+
+			inter.editReply('Updated moodle authentication token succesfully.', { ephemeral: true })
+			break
+		case 'set-channel':
+			inter.defer()
+
+			let newChannelID = inter.options[0].value
+			let ch = await client.channels.fetch(newChannelID)
+			if (!ch.isText()) return inter.editReply('Specified channel is not a text channel', { ephemeral: true })
+
+			if (channelID == newChannelID) {
+				return inter.editReply('This channel is already set as notification channel', { ephemeral: true })
+			}
+			channelID = newChannelID
+			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID, botOwnerID }, null, 2), err => {
+				if (err) console.error(err)
+			})
+			inter.editReply('Updated notification channel.')
+			break
+		case 'set-log-channel':
+			inter.defer()
+
+			let newLogChannelID = inter.options[0].value
+			let lch = await client.channels.fetch(newLogChannelID)
+			if (!lch.isText()) return inter.editReply('Specified channel is not a text channel', { ephemeral: true })
+
+			if (logChannelID == newLogChannelID) {
+				return inter.editReply('This channel is already set as log channel', { ephemeral: true })
+			}
+			logChannelID = newLogChannelID
+			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID, botOwnerID }, null, 2), err => {
+				if (err) console.error(err)
+			})
+			inter.editReply('Updated log channel.')
+			break
+	}
+})
+
+/**
+ * Runs reportChanges and sends notification to channels. Made for being an argiment for setInterval
+ */
 async function intervalChanges() {
-	console.log(`running check at ${new Date()}`)
 	let channel = await client.channels.fetch(channelID)
-	reportChanges(channel)
+	let logChannel = await client.channels.fetch(logChannelID)
+
+	logChannel.send(`running check at ${new Date()}`)
+
+	let changes = await reportChanges()
+
+	if (changes.msg) {
+		logChannel.send(changes.msg)
+		if (changes.msg != 'no differences') channel.send(changes.msg)
+		return
+	}
+
+	var embed = createEmbed(changes)
+
+	if (channel.guild) {
+		if (!channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
+		} else if (channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
+			channel.send(embed)
+		} else {
+			channel.send('failed to send message - make sure embed permissions are enabled for the bot')
+		}
+	} else {
+		channel.send(embed)
+	}
 }
 
 client.setInterval(intervalChanges, 900000)
