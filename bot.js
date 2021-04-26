@@ -439,17 +439,7 @@ async function intervalChanges() {
 	}
 
 	var embed = createEmbed(changes)
-
-	if (channel.guild) {
-		if (!channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
-		} else if (channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
-			channel.send(embed)
-		} else {
-			channel.send('failed to send message - make sure embed permissions are enabled for the bot')
-		}
-	} else {
-		channel.send(embed)
-	}
+	channel.send(embed)
 }
 
 client.setInterval(intervalChanges, 900000)
