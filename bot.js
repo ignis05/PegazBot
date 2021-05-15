@@ -3,8 +3,6 @@ const Discord = require('discord.js')
 const fs = require('fs')
 const _ = require('lodash')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
-const { resolve } = require('path')
-const { isEmpty } = require('lodash')
 const { exit } = require('process')
 
 // #region load config
@@ -99,7 +97,7 @@ async function scrapePegaz() {
 					/* console.log(course.title)
 					console.log(course.address)
 					console.log('------------------------') */
-					course.announcements = course.announcements.data[0].data
+					course.announcements = course.announcements?.data[0].data
 				}
 				// console.log('downloaded data')
 				courses.sort((a, b) => a.title.localeCompare(b.title))

@@ -132,6 +132,7 @@
       "Zestaw 3 Plik",
       "Zestaw 4 Plik",
       "Zestaw 5 Plik",
+      "zestaw 6 Plik",
       "Zadanie 1",
       "Zadanie 2",
       "Zadanie 3",
@@ -148,17 +149,28 @@
       "Informacje organizacyjne",
       "Materiały dydaktyczne",
       "Notatki do wykładu",
-      "Wykład - komentarze do notatek rozdział 1"
+      "Wykład - komentarze do notatek rozdział 1",
+      "Wykład - komentarze do notatek rozdział 2",
+      "Wykład - komentarze do notatek rozdział 3",
+      "Wykład - komentarze do notatek rozdział 4"
     ],
     "files": [
       "Ogłoszenia Forum",
       "Forum towarzyskie",
+      "Zasady zaliczania przedmiotu Plik",
       "Całka oznaczona - notatki do wykładu Plik",
       "Całka oznaczona - przykłady Plik",
       "Propozycje zadań na egzamin. Plik",
+      "Notatki do wykładu (aktualizacja 5.05) Plik",
+      "NOTATKI DO WYKŁADU (wersja 28.04) Plik",
       "NOTATKI DO WYKŁADU (aktualizacja 6.04) Plik",
       "Rozdz.1.1 i 1.2 Plik",
-      "Rozdz.1.3,1.4i1.5 Plik"
+      "Rozdz.1.3,1.4i1.5 Plik",
+      "Rozdział 2.1 Plik",
+      "Rozdział 2.2 Plik",
+      "Rozdział 2.3 Plik",
+      "Rozdział 2.4 Plik",
+      "Rozdział 3.1 Plik"
     ],
     "announcements": [
       "Spotkanie informacyjne",
@@ -182,7 +194,11 @@
       "Sekcja ogólna",
       "Temat 1: Argumenty Zenona przeciw ruchowi",
       "Temat 2: Atomizm",
-      "Temat 3: Platonizm"
+      "Temat 3: Platonizm",
+      "Temat 4: Arystotelizm",
+      "Temat 5: Kartezjusz",
+      "Temat 6: Newton",
+      "Temat 7: Leibniz - Clarke"
     ],
     "files": [
       "Ogłoszenia Forum",
@@ -195,16 +211,24 @@
       "Lukrecjusz Plik",
       "Platon - Jaskinia Plik",
       "Platon - Timaios Plik",
-      "Augustyn - Wyznania Plik"
+      "Augustyn - Wyznania Plik",
+      "Arystotelizm Plik",
+      "Rozprawa o metodzie Plik",
+      "Zasady filozofii Plik",
+      "Scholium 1 Plik",
+      "Scholium 2 Plik",
+      "Polemika Leibniz-Clarke Plik"
     ],
     "announcements": [
       "Zespół",
       "Wprowadzenie",
       "\"Przeludnienie\" kursu",
       "Początki filozofii",
+      "Kartezjusz",
       "Holizm",
       "Eleaci",
       "Atomizm",
+      "Arystotelizm",
       "Argumenty Zenona"
     ]
   },
@@ -262,7 +286,10 @@
       "#4 (24.03.2021)",
       "#5 (31.03.2021)",
       "#6 (7.04.2021)",
-      "#7 (14.04.2021)"
+      "#7 (14.04.2021)",
+      "#8 (21.04.2021)",
+      "#9 (28.04.2021)",
+      "#10 (5.05.2021)"
     ],
     "files": [
       "Ankieta początkowa Kwestionariusz",
@@ -275,7 +302,9 @@
       "Klasa std::string ciąg dalszy Plik",
       "Klasa TString Plik",
       "Zestaw zadań 2 Plik",
-      "Operatory i metody klasy TString Plik"
+      "Operatory i metody klasy TString Plik",
+      "Kolokwium 1 Zadanie",
+      "Wzorce projektowe Plik"
     ],
     "announcements": []
   },
@@ -435,6 +464,7 @@
       "Temat 4",
       "Temat 5",
       "Temat 6",
+      "Temat 7",
       "Ćwiczenia dodatkowe"
     ],
     "files": [
@@ -455,7 +485,7 @@
       "Jak wysyłać programy na platformę Pegaz Strona",
       "Materiały do ćwiczeń: spis treści Plik",
       "Konsultacje na MS Teams Adres URL",
-      "Środa, 28.04.2021, godz. 10:15 BigBlueButton (komunikacja synchroniczna)",
+      "Środa, 19.05.2021, godz. 10:15 BigBlueButton (komunikacja synchroniczna)",
       "Czat do komunikacji na wypadek problemów z BBB lub MS Teams",
       "Rezerwa na MS Teams - kanał prywatny: Ćwiczenia, grupa 4 Adres URL",
       "Podstawy Linuksa Plik",
@@ -473,6 +503,8 @@
       "Ćwiczenie 6 Zadanie",
       "Materiały do ćwiczeń Plik",
       "Ćwiczenie 7 Zadanie",
+      "Materiały do ćwiczeń Plik",
+      "Ćwiczenie 8 Zadanie",
       "Materiały do ćwiczeń Plik"
     ],
     "announcements": []
@@ -488,7 +520,9 @@
       "Temat 4",
       "Temat 5",
       "Temat 6",
-      "Temat 7"
+      "Temat 7",
+      "Temat 8",
+      "Temat 9"
     ],
     "files": [
       "Ogłoszenia Forum",
@@ -503,7 +537,9 @@
       "Wykład 4 Plik",
       "Wykład 5 Plik",
       "Wykład 6 Plik",
-      "Wykład 7 Plik"
+      "Wykład 7 Plik",
+      "Wykład 8 Plik",
+      "Wykład 9 Plik"
     ],
     "announcements": []
   },

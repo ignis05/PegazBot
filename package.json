@@ -13,7 +13,7 @@
 	"author": "\"Grzegorz Mikołajczyk\"",
 	"license": "ISC",
 	"dependencies": {
-		"discord.js": "github:vaporox/discord.js#feat-interactions",
+		"discord.js": "github:discordjs/discord.js",
 		"fs": "0.0.1-security",
 		"lodash": "^4.17.20",
 		"nodejs-web-scraper": "^3.3.0"
