@@ -284,62 +284,6 @@ client.on('ready', () => {
 	intervalChanges()
 })
 
-const interactions = [
-	{
-		name: 'ping',
-		description: 'Replies with pong',
-		options: [],
-	},
-	{
-		name: 'check-now',
-		description: 'Immediately runs webscraper and reports changes',
-		options: [],
-	},
-	{
-		name: 'update-token',
-		description: "Updates token used for moodle authentication. (Ephemeral reply - command won't appear in channel)",
-		options: [
-			{
-				name: 'token',
-				type: 'STRING',
-				description: 'value of MoodleSession cookie',
-				required: true,
-			},
-		],
-	},
-	{
-		name: 'set-channel',
-		description: 'Changes channel where bot sends notifications',
-		options: [
-			{
-				name: 'channel',
-				type: 'CHANNEL',
-				description: 'Text channel where notificatins will be sent',
-				required: true,
-			},
-		],
-	},
-	{
-		name: 'set-log-channel',
-		description: 'Changes channel where bot sends notifications',
-		options: [
-			{
-				name: 'channel',
-				type: 'CHANNEL',
-				description: 'Text channel where logs will be sent',
-				required: true,
-			},
-		],
-	},
-]
-// one time lauch - register interactions
-client.once('ready', async () => {
-	// let testGuild = await client.guilds.fetch('467313439413501983')
-	for (let interaction of interactions) {
-		// testGuild.commands.create(interaction)
-		client.application.commands.create(interaction)
-	}
-})
 
 client.on('interaction', async inter => {
 	if (!inter.isCommand()) return
