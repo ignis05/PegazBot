@@ -10,7 +10,7 @@ client.once('ready', async () => {
 	let testGuild = await client.guilds.fetch('467313439413501983')
 	let commands = await testGuild.commands.fetch()
 	commands.each(cmd => {
-		cmd.delete()
+		await cmd.delete()
 	})
 	console.log('done')
 	exit(0)

@@ -11,7 +11,7 @@ client.once('ready', async () => {
 	console.log('starting')
 	let testGuild = await client.guilds.fetch('467313439413501983')
 	for (let interaction of interactions) {
-		testGuild.commands.create(interaction)
+		await testGuild.commands.create(interaction)
 	}
 	console.log('done')
 	exit(0)

@@ -10,7 +10,7 @@ const client = new Discord.Client({ intents })
 client.once('ready', async () => {
 	console.log('starting')
 	for (let interaction of interactions) {
-		client.application.commands.create(interaction)
+		await client.application.commands.create(interaction)
 	}
 	console.log('done')
 	exit(0)

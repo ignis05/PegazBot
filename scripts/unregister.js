@@ -9,7 +9,7 @@ client.once('ready', async () => {
 	console.log('starting')
 	let commands = await client.application.commands.fetch()
 	commands.each(cmd => {
-		cmd.delete()
+		await cmd.delete()
 	})
 	console.log('done')
     exit(0)
