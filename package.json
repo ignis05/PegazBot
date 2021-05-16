@@ -8,7 +8,10 @@
 		"start": "pm2 start ecosystem.config.js",
 		"stop": "pm2 delete PegazBot",
 		"log": "pm2 log",
-		"monit": "pm2 monit"
+		"monit": "pm2 monit",
+		"register": "node scripts/register.js",
+		"test_register": "node scripts/register_test.js",
+		"test_unregister": "node scripts/unregister_test.js"
 	},
 	"author": "\"Grzegorz Mikołajczyk\"",
 	"license": "ISC",

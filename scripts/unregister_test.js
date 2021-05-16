@@ -6,13 +6,14 @@ const intents = new Discord.Intents()
 const client = new Discord.Client({ intents })
 
 client.once('ready', async () => {
-	console.log('starting')
+	console.log('Clearing all commands registered on testGuild')
 	let testGuild = await client.guilds.fetch('467313439413501983')
 	let commands = await testGuild.commands.fetch()
-	commands.each(cmd => {
+	for (let cmd of commands.array()) {
+		console.log(`Removing ${cmd.name}`)
 		await cmd.delete()
-	})
-	console.log('done')
+	}
+	console.log('TestGuild command list purge completed')
 	exit(0)
 })
 
