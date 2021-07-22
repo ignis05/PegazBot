@@ -10,18 +10,6 @@
         "options": []
     },
     {
-        "name": "update-token",
-        "description": "Updates token used for moodle authentication. (Ephemeral reply - command won't appear in channel)",
-        "options": [
-            {
-                "name": "token",
-                "type": "STRING",
-                "description": "value of MoodleSession cookie",
-                "required": true
-            }
-        ]
-    },
-    {
         "name": "set-channel",
         "description": "Changes channel where bot sends notifications",
         "options": [

@@ -3,16 +3,19 @@ const Discord = require('discord.js')
 const fs = require('fs')
 const _ = require('lodash')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
+const puppeteer = require('puppeteer')
 const { exit } = require('process')
 
 // #region load config
 
 var auth
 var COURSES
+var moodleToken
 
 let authPlaceholder = {
 	token: 'Discord bot token',
-	MoodleSession: 'MoodleSession cookie copied from browser',
+	login: 'login',
+	password: 'password',
 }
 try {
 	auth = require('./data/auth.json')
@@ -25,13 +28,19 @@ try {
 		fs.mkdirSync('./data')
 	}
 	fs.writeFileSync('./data/auth.json', JSON.stringify(authPlaceholder, null, 2))
-	console.error('Auth not found: You need to paste bot auth to ./data/auth.json')
+	console.error('Auth not found: You need to add login data to ./data/auth.json')
 	exit(0)
 }
 try {
 	COURSES = require('./data/pegazdownload.json')
 } catch (err) {
 	COURSES = false
+}
+try {
+	moodleToken = require('./data/moodleSession.json').moodleToken
+} catch (err) {
+	moodleToken = 'placeholder'
+	fs.writeFileSync('./data/moodleSession.json', JSON.stringify({ moodleToken }, null, 2))
 }
 
 var { botOwnerID, channelID, logChannelID } = require('./data/config.json')
@@ -59,7 +68,7 @@ function createScraper(moodle_cookie) {
 		proxy: null, //Use a proxy. Pass a full proxy URL, including the protocol and the port.
 	})
 }
-var scraper = createScraper(auth.MoodleSession)
+var scraper = createScraper(moodleToken)
 /**
  * Runs webscraper to get courses data
  * @returns {Promise<Array>} Promise object with an array of courses
@@ -93,6 +102,12 @@ async function scrapePegaz() {
 		scraper
 			.scrape(root)
 			.then(() => {
+				// token expired and pegaz is redirecting to login page
+				if (root.getErrors()?.[0]?.includes('Error: maximum redirect reached')) {
+					console.log('redirect error - token might be expired')
+					getNewToken()
+				}
+
 				for (let course of courses) {
 					/* console.log(course.title)
 					console.log(course.address)
@@ -109,6 +124,38 @@ async function scrapePegaz() {
 				console.error(err)
 				reject(err)
 			})
+	})
+}
+
+/**
+ * Logs in to pegaz and saves new token
+ * @returns {Promise} Promise object when done
+ */
+function getNewToken() {
+	return new Promise(async (resolve, reject) => {
+		console.log('getting new moodle token')
+		const browser = await puppeteer.launch()
+		const page = await browser.newPage()
+		await page.goto('https://login.uj.edu.pl/login')
+
+		// sign in
+		await page.focus('input[id="username"]')
+		await page.keyboard.type(auth.login)
+		await page.focus('input[id="password"]')
+		await page.keyboard.type(auth.password)
+		await page.click('input[name="submit"]')
+
+		// get pegaz cookies
+		await page.goto('https://pegaz.uj.edu.pl/my')
+		const cookies = await page.cookies()
+
+		moodleToken = cookies.find(el => el.name == 'MoodleSession').value
+		fs.writeFileSync('./data/moodleSession.json', JSON.stringify({ moodleToken }, null, 2))
+		scraper = createScraper(moodleToken)
+
+		await browser.close()
+		console.log('new moodle token received')
+		resolve(moodleToken)
 	})
 }
 // #endregion scraper
@@ -284,7 +331,6 @@ client.on('ready', () => {
 	intervalChanges()
 })
 
-
 client.on('interaction', async inter => {
 	if (!inter.isCommand()) return
 
@@ -315,18 +361,6 @@ client.on('interaction', async inter => {
 			} else {
 				inter.editReply(embed)
 			}
-			break
-		case 'update-token':
-			inter.defer()
-
-			auth.MoodleSession = inter.options[0].value
-
-			fs.writeFile('./data/auth.json', JSON.stringify(auth, null, 2), err => {
-				if (err) console.error(err)
-			})
-			scraper = createScraper(auth.MoodleSession)
-
-			inter.editReply('Updated moodle authentication token succesfully.', { ephemeral: true })
 			break
 		case 'set-channel':
 			inter.defer()
