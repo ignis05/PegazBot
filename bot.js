@@ -285,7 +285,10 @@ function reportChanges() {
 			return
 		}
 
-		client.user.setActivity(`Last check: ${new Date().toLocaleString('pl-PL')}`)
+		let date = new Date().toLocaleString('pl-PL').split(', ')
+		date.reverse()
+		date = date.join(', ')
+		client.user.setActivity(`Last check: ${date}`)
 
 		// check if all courses are there
 		// console.log('new courses check')
