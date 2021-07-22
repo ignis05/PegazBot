@@ -285,6 +285,8 @@ function reportChanges() {
 			return
 		}
 
+		client.user.setActivity(`Last check: ${new Date().toLocaleString('pl-PL')}`)
+
 		// check if all courses are there
 		// console.log('new courses check')
 		let newNames = newCourses.map(c => c.title)
@@ -406,18 +408,18 @@ client.on('interaction', async inter => {
 })
 
 /**
- * Runs reportChanges and sends notification to channels. Made for being an argiment for setInterval
+ * Runs reportChanges and sends notifications to channels. Made for being an argument for setInterval
  */
 async function intervalChanges() {
 	let channel = await client.channels.fetch(channelID)
 	let logChannel = await client.channels.fetch(logChannelID)
 
-	logChannel.send(`running check at ${new Date()}`)
+	if (logChannel) logChannel.send(`running check at ${new Date()}`)
 
 	let changes = await reportChanges()
 
 	if (changes.msg) {
-		logChannel.send(changes.msg)
+		if (logChannel) logChannel.send(changes.msg)
 		if (changes.msg != 'no differences') channel.send(changes.msg)
 		return
 	}
