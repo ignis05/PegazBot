@@ -2,6 +2,7 @@ const path = require('path')
 const Discord = require('discord.js')
 const fs = require('fs')
 const _ = require('lodash')
+const delay = require('delay')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
 const puppeteer = require('puppeteer')
 const { exit } = require('process')
@@ -134,9 +135,9 @@ async function scrapePegaz() {
 function getNewToken() {
 	return new Promise(async (resolve, reject) => {
 		console.log('getting new moodle token')
-		const browser = await puppeteer.launch()
+		const browser = await puppeteer.launch({ executablePath: 'chromium-browser' })
 		const page = await browser.newPage()
-		await page.goto('https://login.uj.edu.pl/login')
+		await page.goto('https://pegaz.uj.edu.pl/my/')
 
 		// sign in
 		await page.focus('input[id="username"]')
@@ -146,14 +147,21 @@ function getNewToken() {
 		await page.click('input[name="submit"]')
 
 		// get pegaz cookies
-		await page.goto('https://pegaz.uj.edu.pl/my')
+		await delay(2000)
 		const cookies = await page.cookies()
 
-		moodleToken = cookies.find(el => el.name == 'MoodleSession').value
+		await browser.close()
+
+		// get moodle cookie
+		var moodleCookie = cookies.find(el => el.name == 'MoodleSession')
+		if (!moodleCookie) {
+			console.log('getting token failed')
+			resolve('failed')
+		}
+		moodleToken = moodleCookie.value
 		fs.writeFileSync('./data/moodleSession.json', JSON.stringify({ moodleToken }, null, 2))
 		scraper = createScraper(moodleToken)
 
-		await browser.close()
 		console.log('new moodle token received')
 		resolve(moodleToken)
 	})
