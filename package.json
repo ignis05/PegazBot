@@ -17,7 +17,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"delay": "^5.0.0",
-		"discord.js": "github:discordjs/discord.js",
+		"discord.js": "^13.0.1",
 		"fs": "0.0.1-security",
 		"lodash": "^4.17.20",
 		"nodejs-web-scraper": "^3.3.0",

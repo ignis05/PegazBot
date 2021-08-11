@@ -1,4 +1,3 @@
-const path = require('path')
 const Discord = require('discord.js')
 const fs = require('fs')
 const _ = require('lodash')
@@ -6,6 +5,8 @@ const delay = require('delay')
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
 const puppeteer = require('puppeteer')
 const { exit } = require('process')
+var os = require('os')
+const isWindows = os.platform() === 'win32'
 
 // #region load config
 
@@ -135,7 +136,7 @@ async function scrapePegaz() {
 function getNewToken() {
 	return new Promise(async (resolve, reject) => {
 		console.log('getting new moodle token')
-		const browser = await puppeteer.launch({ executablePath: 'chromium-browser' })
+		const browser = await puppeteer.launch(isWindows ? {} : { executablePath: 'chromium-browser' })
 		const page = await browser.newPage()
 		await page.goto('https://pegaz.uj.edu.pl/my/')
 
@@ -431,7 +432,7 @@ async function intervalChanges() {
 	channel.send(embed)
 }
 
-client.setInterval(intervalChanges, 900000)
+setInterval(intervalChanges, 900000)
 
 client.on('error', console.error)
 client.login(auth.token)
