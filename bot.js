@@ -1,180 +1,13 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const _ = require('lodash')
-const delay = require('delay')
-const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
-const puppeteer = require('puppeteer')
-const { exit } = require('process')
-var os = require('os')
-const isWindows = os.platform() === 'win32'
 
-// #region load config
+const config = require('./modules/config')
 
-var auth
-var COURSES
-var moodleToken
 
-let authPlaceholder = {
-	token: 'Discord bot token',
-	login: 'login',
-	password: 'password',
-}
-try {
-	auth = require('./data/auth.json')
-	if (auth == authPlaceholder) {
-		console.error('Auth is a placeholder: You need to add auth info to ./data/auth.json')
-		return
-	}
-} catch (err) {
-	if (!fs.existsSync('./data')) {
-		fs.mkdirSync('./data')
-	}
-	fs.writeFileSync('./data/auth.json', JSON.stringify(authPlaceholder, null, 2))
-	console.error('Auth not found: You need to add login data to ./data/auth.json')
-	exit(0)
-}
-try {
-	COURSES = require('./data/pegazdownload.json')
-} catch (err) {
-	COURSES = false
-}
-try {
-	moodleToken = require('./data/moodleSession.json').moodleToken
-} catch (err) {
-	moodleToken = 'placeholder'
-	fs.writeFileSync('./data/moodleSession.json', JSON.stringify({ moodleToken }, null, 2))
-}
 
-var { botOwnerID, channelID, logChannelID } = require('./data/config.json')
-// #endregion load config
-
-// #region scraper
-var scraper
-function createScraper(moodle_cookie) {
-	return new Scraper({
-		baseSiteUrl: 'https://pegaz.uj.edu.pl', //Mandatory.If your site sits in a subfolder, provide the path WITHOUT it.
-		startUrl: 'https://pegaz.uj.edu.pl/my', //Mandatory. The page from which the process begins.
-		logPath: './logs', //Highly recommended.Will create a log for each scraping operation(object).
-		cloneImages: true, //If an image with the same name exists, a new file with a number appended to it is created. Otherwise. it's overwritten.
-		showConsoleLogs: false, //Whether to show or hide messages.
-		removeStyleAndScriptTags: true, // Removes any <style> and <script> tags found on the page, in order to serve Cheerio with a light-weight string. change this ONLY if you have to.
-		concurrency: 3, //Maximum concurrent requests.Highly recommended to keep it at 10 at most.
-		maxRetries: 1, //Maximum number of retries of a failed request.
-		delay: 200,
-		timeout: 6000,
-		filePath: null, //Needs to be provided only if a "downloadContent" operation is created.
-		auth: null, //Can provide basic auth credentials(no clue what sites actually use it).
-		headers: {
-			Cookie: 'MoodleSession=' + moodle_cookie,
-		}, //Provide custom headers for the requests.
-		proxy: null, //Use a proxy. Pass a full proxy URL, including the protocol and the port.
-	})
-}
-var scraper = createScraper(moodleToken)
-/**
- * Runs webscraper to get courses data
- * @returns {Promise<Array>} Promise object with an array of courses
- */
-async function scrapePegaz() {
-	return new Promise((resolve, reject) => {
-		var courses = []
-
-		function getPageObject(element) {
-			courses.push(element)
-		}
-
-		const root = new Root()
-
-		const course = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]', { name: 'course', getPageObject })
-		const title = new CollectContent('header#page-header h1', { name: 'title' })
-		const tematy = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
-		const pliki = new CollectContent('ul.topics div.content .instancename', { name: 'files' })
-		const ogloszenia = new OpenLinks('div.activityinstance a.aalink', { name: 'announcements', slice: [0, 1] })
-		const ogl_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
-
-		root.addOperation(course)
-		course.addOperation(title)
-		course.addOperation(tematy)
-		course.addOperation(pliki)
-		course.addOperation(ogloszenia)
-		ogloszenia.addOperation(ogl_titles)
-
-		// console.log('started scraping')
-
-		scraper
-			.scrape(root)
-			.then(() => {
-				// token expired and pegaz is redirecting to login page
-				if (root.getErrors()?.[0]?.includes('Error: maximum redirect reached')) {
-					console.log('redirect error - token might be expired')
-					getNewToken()
-				}
-
-				for (let course of courses) {
-					/* console.log(course.title)
-					console.log(course.address)
-					console.log('------------------------') */
-					course.announcements = course.announcements?.data[0].data
-				}
-				// console.log('downloaded data')
-				courses.sort((a, b) => a.title.localeCompare(b.title))
-				// console.log('download successfull')
-				resolve(courses)
-			})
-			.catch(err => {
-				console.log(`error running check at ${new Date()}`)
-				console.error(err)
-				reject(err)
-			})
-	})
-}
-
-/**
- * Logs in to pegaz and saves new token
- * @returns {Promise} Promise object when done
- */
-function getNewToken() {
-	return new Promise(async (resolve, reject) => {
-		console.log('getting new moodle token')
-		const browser = await puppeteer.launch(isWindows ? {} : { executablePath: 'chromium-browser' })
-		const page = await browser.newPage()
-		await page.goto('https://pegaz.uj.edu.pl/my/')
-
-		// sign in
-		await page.focus('input[id="username"]')
-		await page.keyboard.type(auth.login)
-		await page.focus('input[id="password"]')
-		await page.keyboard.type(auth.password)
-		await page.click('input[name="submit"]')
-
-		// get pegaz cookies
-		await delay(2000)
-		const cookies = await page.cookies()
-
-		await browser.close()
-
-		// get moodle cookie
-		var moodleCookie = cookies.find(el => el.name == 'MoodleSession')
-		if (!moodleCookie) {
-			console.log('getting token failed')
-			resolve('failed')
-		}
-		moodleToken = moodleCookie.value
-		fs.writeFileSync('./data/moodleSession.json', JSON.stringify({ moodleToken }, null, 2))
-		scraper = createScraper(moodleToken)
-
-		console.log('new moodle token received')
-		resolve(moodleToken)
-	})
-}
-// #endregion scraper
-
-// #region discord
-/**
- * Saves COURSES to pegazdownload.json
- */
 function saveCourses() {
-	fs.writeFile('./data/pegazdownload.json', JSON.stringify(COURSES, null, 2), err => {
+	fs.writeFile('./data/pegazdownload.json', JSON.stringify(download, null, 2), err => {
 		if (err) console.error(err)
 	})
 }
@@ -184,7 +17,7 @@ function compareChanges(newCourses) {
 		return {}
 	} else {
 		changes = {}
-		COURSES.forEach((course, i) => {
+		download.forEach((course, i) => {
 			newCourse = newCourses.find(c => c.title == course.title)
 			if (!newCourse) return
 			// console.log('---------------------------')
@@ -222,7 +55,12 @@ function createEmbed(output) {
 
 	// console.log(fields)
 
-	const embed = new Discord.MessageEmbed().setColor('#0099ff').setTitle('New Pegaz Content').setURL('https://pegaz.uj.edu.pl/').addFields(fields).setTimestamp()
+	const embed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTitle('New Pegaz Content')
+		.setURL('https://pegaz.uj.edu.pl/')
+		.addFields(fields)
+		.setTimestamp()
 
 	if (added) embed.addField('---New Courses Found---', added)
 
@@ -261,8 +99,8 @@ function formatVal(obj) {
 function reportChanges() {
 	return new Promise(async (res, rej) => {
 		var output = { added: null, deleted: null, diff: null, msg: null }
-		if (!COURSES) {
-			COURSES = await scrapePegaz().catch(err => {
+		if (!download) {
+			download = await scrapePegaz().catch(err => {
 				output.msg = 'failed to fetch data'
 				res(output)
 			})
@@ -294,7 +132,7 @@ function reportChanges() {
 		// check if all courses are there
 		// console.log('new courses check')
 		let newNames = newCourses.map(c => c.title)
-		let names = COURSES.map(c => c.title)
+		let names = download.map(c => c.title)
 		// console.log(names)
 		// console.log(newNames)
 		let added = _.difference(newNames, names)
@@ -315,7 +153,7 @@ function reportChanges() {
 		let diff = compareChanges(newCourses)
 		if (!diff || _.isEmpty(diff)) {
 			if (addedOrDeleted) {
-				COURSES = newCourses
+				download = newCourses
 				console.log('added or deleted')
 				saveCourses()
 				res(output)
@@ -328,7 +166,7 @@ function reportChanges() {
 		}
 		output.diff = diff
 
-		COURSES = newCourses
+		download = newCourses
 		saveCourses()
 		res(output)
 	})
@@ -338,7 +176,7 @@ const intents = new Discord.Intents()
 const client = new Discord.Client({ intents })
 
 client.on('ready', () => {
-	client.users.fetch(botOwnerID).then(owner => {
+	client.users.fetch(auth.botOwnerId).then(owner => {
 		owner.send('Ready!')
 	})
 	console.log('Ready!')
@@ -387,7 +225,7 @@ client.on('interaction', async inter => {
 				return inter.editReply('This channel is already set as notification channel', { ephemeral: true })
 			}
 			channelID = newChannelID
-			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID, botOwnerID }, null, 2), err => {
+			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID }, null, 2), err => {
 				if (err) console.error(err)
 			})
 			inter.editReply('Updated notification channel.')
@@ -403,7 +241,7 @@ client.on('interaction', async inter => {
 				return inter.editReply('This channel is already set as log channel', { ephemeral: true })
 			}
 			logChannelID = newLogChannelID
-			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID, botOwnerID }, null, 2), err => {
+			fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID }, null, 2), err => {
 				if (err) console.error(err)
 			})
 			inter.editReply('Updated log channel.')
