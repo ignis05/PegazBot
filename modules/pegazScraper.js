@@ -56,8 +56,8 @@ function formatCourses(courses) {
 					break
 				case 'grades':
 					let grades = []
-					let names = prop.data[0].data.find(el => el.name === 'g_name').data
-					let values = prop.data[0].data.find(el => el.name === 'g_value').data
+					let names = prop.data[0].data.find((el) => el.name === 'g_name').data
+					let values = prop.data[0].data.find((el) => el.name === 'g_value').data
 					for (let i in names) {
 						let vdom = cheerio.load(names[i])
 						let link = vdom('a').attr('href')
@@ -131,12 +131,12 @@ module.exports = {
 			let oldCourses = config.download
 
 			// detect adder or deleted courses
-			let newIdMap = newCourses.map(el => el.id)
-			let oldIdMap = oldCourses.map(el => el.id)
+			let newIdMap = newCourses.map((el) => el.id)
+			let oldIdMap = oldCourses.map((el) => el.id)
 			let addedCourseIds = _.difference(newIdMap, oldIdMap)
 			let deletedCourseIds = _.difference(oldIdMap, newIdMap)
-			let addedCourses = newCourses.filter(course => addedCourseIds.includes(course.id))
-			let deletedCourses = newCourses.filter(course => deletedCourseIds.includes(course.id))
+			let addedCourses = newCourses.filter((course) => addedCourseIds.includes(course.id))
+			let deletedCourses = newCourses.filter((course) => deletedCourseIds.includes(course.id))
 
 			const result = { added: addedCourses, removed: deletedCourses, changed: [] }
 
@@ -147,25 +147,25 @@ module.exports = {
 
 				// compare old and new
 				let newCourse = _.cloneDeep(course)
-				let oldCourse = oldCourses.find(el => el.id === newCourse.id)
+				let oldCourse = oldCourses.find((el) => el.id === newCourse.id)
 				for (let key of Object.keys(newCourse)) {
 					// for items with ids
 					if (['grades', 'files'].includes(key)) {
-						let newIds = newCourse[key].map(el => el.id)
-						let oldIds = oldCourse[key].map(el => el.id)
+						let newIds = newCourse[key].map((el) => el.id)
+						let oldIds = oldCourse[key].map((el) => el.id)
 
 						let addedIds = _.difference(newIds, oldIds)
 						let deletedIds = _.difference(oldIds, newIds)
 
-						let addedEls = newCourse[key].filter(el => addedIds.includes(el.id))
-						let deletedEls = oldCourse[key].filter(el => deletedIds.includes(el.id))
+						let addedEls = newCourse[key].filter((el) => addedIds.includes(el.id))
+						let deletedEls = oldCourse[key].filter((el) => deletedIds.includes(el.id))
 						// existing elements with changed value or name
 						let changedEls = []
 						for (let newEl of newCourse[key]) {
 							if (addedIds.includes(newEl.id)) continue
 
 							let changedEl = { id: newEl.id }
-							let oldEl = oldCourse[key].find(el => el.id === newEl.id)
+							let oldEl = oldCourse[key].find((el) => el.id === newEl.id)
 							for (let key of Object.keys(newEl)) {
 								if (newEl[key] !== oldEl[key])
 									changedEl[key] = {
@@ -292,7 +292,7 @@ module.exports = {
 
 					resolve(formatCourses(courses.getData()))
 				})
-				.catch(err => {
+				.catch((err) => {
 					console.log(`error running check at ${new Date()}`)
 					console.error(err)
 					reject(err)
@@ -325,7 +325,7 @@ module.exports = {
 			await browser.close()
 
 			// get moodle cookie
-			var moodleCookie = cookies.find(el => el.name == 'MoodleSession')
+			var moodleCookie = cookies.find((el) => el.name == 'MoodleSession')
 			if (!moodleCookie) {
 				console.log('getting token failed')
 				reject('failed')
