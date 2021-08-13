@@ -12,6 +12,8 @@ const fs = require('fs')
  * @typedef {Object} ChannelsObject
  * @property {Array<string>} alert - array of channel Ids where the bot will send notifications
  * @property {Array<string>} log - array of channel Ids where the bot will send logs
+ * @method add - adds channel to the list
+ * @method del - removes channel from the list
  */
 
 /**
@@ -63,6 +65,33 @@ try {
 	}
 	fs.writeFileSync('./data/channels.json', JSON.stringify(channelsPlaceholder, null, 2))
 	result.channels = channelsPlaceholder
+}
+/** @typedef {import("discord.js").Snowflake} Snowflake */
+
+/**
+ * Adds channel id to the alert list. log=true adds to log list instead
+ * @param {Snowflake} id
+ * @param {boolean} log
+ */
+channels.add = function (id, log = false) {
+	/** @type {Array} */
+	let channelsList = log ? channels.log : channels.alert
+	if (channelsList.includes(id)) return console.error(`trying to add existing channel ${id}`)
+	channelsList.push(id)
+	fs.writeFileSync('./data/channels.json', JSON.stringify(result.channels, null, 2))
+}
+/**
+ * Removes channel id from the alert list. log=true removes from log list instead
+ * @param {Snowflake} id
+ * @param {boolean} log
+ */
+channels.del = function (id, log = false) {
+	/** @type {Array} */
+	let channelsList = log ? channels.log : channels.alert
+	if (!channelsList.includes(id)) return console.error(`trying to remove not existing channel ${id}`)
+	let index = channelsList.indexOf(id)
+	channelsList.splice(index, 1)
+	fs.writeFileSync('./data/channels.json', JSON.stringify(result.channels, null, 2))
 }
 
 // pegaz download

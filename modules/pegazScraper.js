@@ -84,31 +84,154 @@ function formatCourses(courses) {
 	return result
 }
 
+/**
+ * Runs webscraper to get courses data
+ * @returns {Promise<Array>} Promise object with an array of courses
+ */
+function scrapePegaz() {
+	return new Promise(async (resolve, reject) => {
+		const scraper = new Scraper({
+			baseSiteUrl: 'https://pegaz.uj.edu.pl',
+			startUrl: 'https://pegaz.uj.edu.pl/my',
+			logPath: './logs',
+			cloneImages: true,
+			showConsoleLogs: false,
+			removeStyleAndScriptTags: true,
+			concurrency: 3,
+			maxRetries: 1,
+			delay: 200,
+			timeout: 6000,
+			filePath: null,
+			auth: null,
+			headers: {
+				Cookie: 'MoodleSession=' + config.moodleToken,
+			},
+			proxy: null,
+		})
+
+		const root = new Root()
+		const courses = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]')
+		const title = new CollectContent('div#page-navbar a[aria-current="page"]', { name: 'title' })
+		const topics = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
+		const files = new CollectContent('li.activity.resource div.activityinstance', { name: 'files', contentType: 'html' })
+		const announcements = new OpenLinks('li.activity.forum a.aalink', { name: 'announcements', slice: [0, 1] })
+		const ann_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
+		const grades = new OpenLinks('a.list-group-item.list-group-item-action[data-key="grades"]', { name: 'grades' })
+		const grade_name = new CollectContent('th.column-itemname.level2', { name: 'g_name', contentType: 'html' })
+		const grade_val = new CollectContent('td.column-grade.level2', { name: 'g_value' })
+
+		root.addOperation(courses)
+		courses.addOperation(title)
+		courses.addOperation(topics)
+		courses.addOperation(files)
+		courses.addOperation(announcements)
+		announcements.addOperation(ann_titles)
+		courses.addOperation(grades)
+		grades.addOperation(grade_name)
+		grades.addOperation(grade_val)
+
+		// console.log('started scraping')
+
+		scraper
+			.scrape(root)
+			.then(async () => {
+				// token expired and pegaz is redirecting to login page
+				if (root.getErrors()?.[0]?.includes('Error: maximum redirect reached')) {
+					console.log('redirect error - token might be expired')
+					await getNewToken()
+					return reject('token updated')
+				}
+
+				resolve(formatCourses(courses.getData()))
+			})
+			.catch((err) => {
+				console.log(`error running check at ${new Date()}`)
+				console.error(err)
+				reject(err)
+			})
+	})
+}
+
+/**
+ * Logs in to pegaz and saves new token
+ * @returns {Promise} Promise object when done
+ */
+function getNewToken() {
+	return new Promise(async (resolve, reject) => {
+		console.log('getting new moodle token')
+		const browser = await puppeteer.launch(isWindows ? {} : { executablePath: 'chromium-browser' })
+		const page = await browser.newPage()
+		await page.goto('https://pegaz.uj.edu.pl/my/')
+
+		// sign in
+		await page.focus('input[id="username"]')
+		await page.keyboard.type(config.auth.login)
+		await page.focus('input[id="password"]')
+		await page.keyboard.type(config.auth.password)
+		await page.click('input[name="submit"]')
+
+		// get pegaz cookies
+		await delay(2000)
+		const cookies = await page.cookies()
+
+		await browser.close()
+
+		// get moodle cookie
+		var moodleCookie = cookies.find((el) => el.name == 'MoodleSession')
+		if (!moodleCookie) {
+			console.log('getting token failed')
+			reject('failed')
+		}
+		moodleToken = moodleCookie.value
+		config.updateMoodleToken(moodleToken)
+
+		console.log('new moodle token received')
+		resolve(moodleToken)
+	})
+}
+
+// const result = { added: addedCourses, removed: deletedCourses, changed: [] }
+
+/**
+ * @typedef {Object} Changes
+ * @property {Array<Object>} added - newly added courses
+ * @property {Array<Object>} removed - courses that were no longer accessible
+ * @property {Array<Object>} changed - courses that were changed with additional 'changes' property
+ */
+
+/**
+ * @typedef {Object} ScrapedData
+ * @property {boolean} success - whether scraper was able to access the website
+ * @property {('token update failed'|'token updated, scraping failed'|'scraping failed'|'first download'|'differences found'|'no differences')} msg - status message
+ * @property {Error} [err] - if success=false details will be here
+ * @property {Changes} [result] - if success=true any found differences will be there
+ */
+
 module.exports = {
 	/**
 	 * Perfroms web scraping operation on pegaz.
 	 * Automatically refreshes token as needed.
 	 * Doesnt reject promise, in case of fail returns {success:false}.
 	 * Automatically updates pegazdownload.json for future references.
-	 * @return Promise<Object> with success and msg properties and optional result or err properties
+	 * @return {Promise<ScrapedData>} with success and msg properties and optional result or err properties
 	 */
 	scrapingOperation() {
 		return new Promise(async (resolve, reject) => {
 			let newCourses
 			// --- scrape pegaz ---
 			try {
-				newCourses = await this.scrapePegaz()
+				newCourses = await scrapePegaz()
 			} catch (err) {
 				// rejected because moodle token was updated - try again
 				if (err === 'token updated') {
 					try {
-						newCourses = await this.scrapePegaz()
+						newCourses = await scrapePegaz()
 					} catch (err2) {
 						if (err === 'token updated') {
-							return resolve({ success: false, msg: 'failed to update token 2nd time' })
+							return resolve({ success: false, msg: 'token update failed' })
 						}
 						console.error(err2)
-						return resolve({ success: false, msg: 'updated token, second scraping failed', err: err2 })
+						return resolve({ success: false, msg: 'token updated, scraping failed', err: err2 })
 					}
 				}
 				// other errors
@@ -117,8 +240,6 @@ module.exports = {
 					return resolve({ success: false, msg: 'scraping failed', err })
 				}
 			}
-
-			// console.log(newCourses)
 
 			// --- compare with previous ---
 
@@ -136,8 +257,9 @@ module.exports = {
 			let addedCourseIds = _.difference(newIdMap, oldIdMap)
 			let deletedCourseIds = _.difference(oldIdMap, newIdMap)
 			let addedCourses = newCourses.filter((course) => addedCourseIds.includes(course.id))
-			let deletedCourses = newCourses.filter((course) => deletedCourseIds.includes(course.id))
+			let deletedCourses = oldCourses.filter((course) => deletedCourseIds.includes(course.id))
 
+			/** @type {Changes} */
 			const result = { added: addedCourses, removed: deletedCourses, changed: [] }
 
 			for (let course of newCourses) {
@@ -229,112 +351,6 @@ module.exports = {
 			} else {
 				resolve({ success: true, msg: 'no differences' })
 			}
-		})
-	},
-
-	/**
-	 * Runs webscraper to get courses data
-	 * @returns {Promise<Array>} Promise object with an array of courses
-	 */
-	scrapePegaz() {
-		return new Promise(async (resolve, reject) => {
-			const scraper = new Scraper({
-				baseSiteUrl: 'https://pegaz.uj.edu.pl',
-				startUrl: 'https://pegaz.uj.edu.pl/my',
-				logPath: './logs',
-				cloneImages: true,
-				showConsoleLogs: false,
-				removeStyleAndScriptTags: true,
-				concurrency: 3,
-				maxRetries: 1,
-				delay: 200,
-				timeout: 6000,
-				filePath: null,
-				auth: null,
-				headers: {
-					Cookie: 'MoodleSession=' + config.moodleToken,
-				},
-				proxy: null,
-			})
-
-			const root = new Root()
-			const courses = new OpenLinks('a.list-group-item.list-group-item-action[data-parent-key="mycourses"]')
-			const title = new CollectContent('div#page-navbar a[aria-current="page"]', { name: 'title' })
-			const topics = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
-			const files = new CollectContent('li.activity.resource div.activityinstance', { name: 'files', contentType: 'html' })
-			const announcements = new OpenLinks('li.activity.forum a.aalink', { name: 'announcements', slice: [0, 1] })
-			const ann_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
-			const grades = new OpenLinks('a.list-group-item.list-group-item-action[data-key="grades"]', { name: 'grades' })
-			const grade_name = new CollectContent('th.column-itemname.level2', { name: 'g_name', contentType: 'html' })
-			const grade_val = new CollectContent('td.column-grade.level2', { name: 'g_value' })
-
-			root.addOperation(courses)
-			courses.addOperation(title)
-			courses.addOperation(topics)
-			courses.addOperation(files)
-			courses.addOperation(announcements)
-			announcements.addOperation(ann_titles)
-			courses.addOperation(grades)
-			grades.addOperation(grade_name)
-			grades.addOperation(grade_val)
-
-			// console.log('started scraping')
-
-			scraper
-				.scrape(root)
-				.then(async () => {
-					// token expired and pegaz is redirecting to login page
-					if (root.getErrors()?.[0]?.includes('Error: maximum redirect reached')) {
-						console.log('redirect error - token might be expired')
-						await this.getNewToken()
-						return reject('token updated')
-					}
-
-					resolve(formatCourses(courses.getData()))
-				})
-				.catch((err) => {
-					console.log(`error running check at ${new Date()}`)
-					console.error(err)
-					reject(err)
-				})
-		})
-	},
-
-	/**
-	 * Logs in to pegaz and saves new token
-	 * @returns {Promise} Promise object when done
-	 */
-	getNewToken() {
-		return new Promise(async (resolve, reject) => {
-			console.log('getting new moodle token')
-			const browser = await puppeteer.launch(isWindows ? {} : { executablePath: 'chromium-browser' })
-			const page = await browser.newPage()
-			await page.goto('https://pegaz.uj.edu.pl/my/')
-
-			// sign in
-			await page.focus('input[id="username"]')
-			await page.keyboard.type(config.auth.login)
-			await page.focus('input[id="password"]')
-			await page.keyboard.type(config.auth.password)
-			await page.click('input[name="submit"]')
-
-			// get pegaz cookies
-			await delay(2000)
-			const cookies = await page.cookies()
-
-			await browser.close()
-
-			// get moodle cookie
-			var moodleCookie = cookies.find((el) => el.name == 'MoodleSession')
-			if (!moodleCookie) {
-				console.log('getting token failed')
-				reject('failed')
-			}
-			moodleToken = moodleCookie.value
-			config.updateMoodleToken(moodleToken)
-
-			console.log('new moodle token received')
-			resolve(moodleToken)
 		})
 	},
 }
