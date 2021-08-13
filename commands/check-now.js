@@ -1,6 +1,6 @@
-const { CommandInteraction } = require('discord.js')
-
 const scraper = require('../modules/pegazScraper')
+
+/** @typedef {import("discord.js").CommandInteraction} CommandInteraction */
 
 module.exports = {
 	interaction: {

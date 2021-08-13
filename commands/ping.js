@@ -1,4 +1,4 @@
-const { CommandInteraction } = require('discord.js')
+/** @typedef {import("discord.js").CommandInteraction} CommandInteraction */
 
 module.exports = {
 	interaction: {
