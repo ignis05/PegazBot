@@ -16,11 +16,12 @@
 	"author": "\"Grzegorz Mikołajczyk\"",
 	"license": "ISC",
 	"dependencies": {
+		"cheerio": "*",
 		"delay": "^5.0.0",
 		"discord.js": "^13.0.1",
 		"fs": "0.0.1-security",
 		"lodash": "^4.17.20",
-		"nodejs-web-scraper": "^3.3.0",
+		"nodejs-web-scraper": "^6.0.1",
 		"puppeteer": "^10.1.0"
 	}
 }

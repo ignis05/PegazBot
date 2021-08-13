@@ -20,6 +20,7 @@ const fs = require('fs')
  * @property {AuthObject} auth - auth data
  * @property {ChannelsObject} channels - channels data
  * @property {DownloadObject} download - downloaded data
+ * @method updateDownload - updates pegaz download
  * @property {string} moodleToken - auth token used to scrape pegaz
  * @method updateMoodleToken - updates moodle token
  */
@@ -74,6 +75,14 @@ try {
 	download = false
 }
 result.download = download
+/**
+ * Updates pegazdownload in config and writes it to json
+ * @param {String} newDownload
+ */
+result.updateDownload = function (newDownload) {
+	result.download = newDownload
+	fs.writeFileSync('./data/pegazdownload.json', JSON.stringify(newDownload, null, 2))
+}
 
 // moodle token
 let moodleToken
