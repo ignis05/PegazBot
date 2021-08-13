@@ -4,7 +4,6 @@ const fs = require('fs')
 /**
  * @typedef {Object} AuthObject
  * @property {string} token - discord bot token
- * @property {string} botOwnerId - discord user id of the bot owner
  * @property {string} login - pegaz login
  * @property {string} password - pegaz password
  */
@@ -27,7 +26,6 @@ const fs = require('fs')
 
 const authPlaceholder = {
 	token: 'discord bot token',
-	botOwnerId: 'discord user id of the bot owner',
 	login: 'pegaz login (email address)',
 	password: 'pegaz password',
 }
