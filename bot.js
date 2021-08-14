@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const fs = require('fs')
 
 const config = require('./modules/config')
 const commands = require('./commands')
@@ -17,6 +18,8 @@ client.on('ready', async () => {
 client.once('ready', () => {
 	runWebScraper()
 	setInterval(runWebScraper, 900000)
+	// save client id for register script
+	fs.writeFileSync('./data/clientId.json', JSON.stringify({ clientId: client.user.id }))
 })
 
 client.on('interactionCreate', (inter) => {
