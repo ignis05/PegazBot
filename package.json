@@ -1,19 +1,17 @@
 {
 	"name": "pegaz-bot",
 	"version": "1.0.0",
-	"description": "\"pegaz - discord bot\"",
+	"description": "Pegaz webscraper reporting changes with discord bot",
 	"main": "bot.js",
 	"repository": "github:ignis05/PegazBot",
 	"scripts": {
 		"start": "pm2 start ecosystem.config.js",
-		"stop": "pm2 delete PegazBot",
+		"stop": "pm2 delete ecosystem.config.js",
 		"log": "pm2 log",
 		"monit": "pm2 monit",
-		"register": "node scripts/register.js",
-		"test_register": "node scripts/register_test.js",
-		"test_unregister": "node scripts/unregister_test.js"
+		"register": "node scripts/register.js"
 	},
-	"author": "\"Grzegorz Mikołajczyk\"",
+	"author": "ignis05",
 	"license": "ISC",
 	"dependencies": {
 		"cheerio": "*",
@@ -21,6 +19,6 @@
 		"discord.js": "^13.1.0",
 		"lodash": "^4.17.20",
 		"nodejs-web-scraper": "^6.0.1",
-		"puppeteer": "^10.1.0"
+		"puppeteer": "^10.2.0"
 	}
 }
