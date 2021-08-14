@@ -37,7 +37,14 @@ module.exports = function broadcastMsg(client, messageOptions, log = false) {
 				config.channels.del(id, log)
 				continue
 			}
-			promises.push(channel.send(messageOptions))
+			promises.push(
+				channel.send(messageOptions).catch((err) => {
+					// DiscordAPIError: Invalid Form Body - if message is too large
+					if (err.code === 50035) {
+						channel.send(`Failed to send embed message because it was too large.`)
+					} else console.error(err)
+				})
+			)
 			count++
 		}
 		await Promise.all(promises)
