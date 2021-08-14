@@ -51,8 +51,25 @@ function formatCourses(courses) {
 					params.sections = prop.data
 					break
 				case 'announcements':
+					let announcements = []
 					// apparently forums can be disabled
-					params.announcements = prop.data[0]?.data[0]?.data || []
+					if (!prop.data[0]?.data[0]?.data) {
+						params.announcements = []
+						break
+					}
+					for (let ann of prop.data[0]?.data[0]?.data) {
+						let vdom = cheerio.load(ann)
+						let link = vdom('a')
+						let url = new URL(link.attr('href'))
+						let id = url.searchParams.get('d')
+						let title = link.attr('title')
+						announcements.push({
+							id: id,
+							link: link.attr('href'),
+							title: title,
+						})
+					}
+					params.announcements = announcements
 					break
 				case 'grades':
 					let grades = []
@@ -115,7 +132,7 @@ function scrapePegaz() {
 		const topics = new CollectContent('ul.topics div.content .sectionname', { name: 'topics' })
 		const files = new CollectContent('li.activity.resource div.activityinstance', { name: 'files', contentType: 'html' })
 		const announcements = new OpenLinks('li.activity.forum a.aalink', { name: 'announcements', slice: [0, 1] })
-		const ann_titles = new CollectContent('tr.discussion th.topic a', { name: 'title' })
+		const ann_titles = new CollectContent('tr.discussion th.topic', { name: 'title', contentType: 'html' })
 		const grades = new OpenLinks('a.list-group-item.list-group-item-action[data-key="grades"]', { name: 'grades' })
 		const grade_name = new CollectContent('th.column-itemname.level2', { name: 'g_name', contentType: 'html' })
 		const grade_val = new CollectContent('td.column-grade.level2', { name: 'g_value' })
@@ -272,7 +289,7 @@ module.exports = {
 				let oldCourse = oldCourses.find((el) => el.id === newCourse.id)
 				for (let key of Object.keys(newCourse)) {
 					// for items with ids
-					if (['grades', 'files'].includes(key)) {
+					if (['grades', 'files', 'announcements'].includes(key)) {
 						let newIds = newCourse[key].map((el) => el.id)
 						let oldIds = oldCourse[key].map((el) => el.id)
 
@@ -286,7 +303,7 @@ module.exports = {
 						for (let newEl of newCourse[key]) {
 							if (addedIds.includes(newEl.id)) continue
 
-							let changedEl = { id: newEl.id }
+							let changedEl = { id: newEl.id, orig: newEl }
 							let oldEl = oldCourse[key].find((el) => el.id === newEl.id)
 							for (let key of Object.keys(newEl)) {
 								if (newEl[key] !== oldEl[key])
@@ -295,7 +312,7 @@ module.exports = {
 										new: newEl[key],
 									}
 							}
-							if (Object.keys(changedEl).length > 1) {
+							if (Object.keys(changedEl).length > 2) {
 								changedEls.push(changedEl)
 							}
 						}

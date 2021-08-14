@@ -1,6 +1,4 @@
 const Discord = require('discord.js')
-const fs = require('fs')
-const _ = require('lodash')
 
 const config = require('./modules/config')
 const commands = require('./commands')
@@ -49,7 +47,7 @@ async function runWebScraper() {
 		case 'scraping failed':
 		case 'token updated, scraping failed':
 			console.log('scraping failed')
-			broadCastMsg(
+			broadcastMsg(
 				client,
 				{
 					embeds: [
@@ -68,7 +66,7 @@ async function runWebScraper() {
 			break
 		case 'token update failed':
 			console.log('token update failed')
-			broadCastMsg(
+			broadcastMsg(
 				client,
 				{
 					embeds: [
@@ -89,7 +87,7 @@ async function runWebScraper() {
 			)
 			break
 		case 'first download':
-			broadCastMsg(client, {
+			broadcastMsg(client, {
 				embeds: [
 					{
 						color: 0x00ff00,
@@ -97,7 +95,7 @@ async function runWebScraper() {
 						fields: [
 							{
 								name: 'info',
-								value: `Correctly downloaded date for the first time and saved it.\n
+								value: `Correctly downloaded data for the first time and saved it.\n
 										Any future differences will be reported.`,
 							},
 						],
