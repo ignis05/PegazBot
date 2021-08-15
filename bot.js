@@ -3,7 +3,7 @@ const fs = require('fs')
 
 const config = require('./modules/config')
 const commands = require('./commands')
-const { scrapingOperation } = require('./modules/pegazScraper')
+const scrapingOperation = require('./modules/pegazScraper')
 const broadcastMsg = require('./modules/messageBroadcaster')
 const createEmbeds = require('./modules/embedCreator')
 

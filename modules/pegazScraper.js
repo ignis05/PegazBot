@@ -224,150 +224,148 @@ function getNewToken() {
  * @property {Changes} [result] - if success=true any found differences will be there
  */
 
-module.exports = {
-	/**
-	 * Perfroms web scraping operation on pegaz.
-	 * Automatically refreshes token as needed.
-	 * Doesnt reject promise, in case of fail returns {success:false}.
-	 * Automatically updates pegazdownload.json for future references.
-	 * @return {Promise<ScrapedData>} with success and msg properties and optional result or err properties
-	 */
-	scrapingOperation() {
-		return new Promise(async (resolve, reject) => {
-			let newCourses
-			// --- scrape pegaz ---
-			try {
-				newCourses = await scrapePegaz()
-			} catch (err) {
-				// rejected because moodle token was updated - try again
-				if (err === 'token updated') {
-					try {
-						newCourses = await scrapePegaz()
-					} catch (err2) {
-						if (err === 'token updated') {
-							return resolve({ success: false, msg: 'token update failed' })
+/**
+ * Perfroms web scraping operation on pegaz.
+ * Automatically refreshes token as needed.
+ * Doesnt reject promise, in case of fail returns {success:false}.
+ * Automatically updates pegazdownload.json for future references.
+ * @return {Promise<ScrapedData>} with success and msg properties and optional result or err properties
+ */
+module.exports = function scrapingOperation() {
+	return new Promise(async (resolve, reject) => {
+		let newCourses
+		// --- scrape pegaz ---
+		try {
+			newCourses = await scrapePegaz()
+		} catch (err) {
+			// rejected because moodle token was updated - try again
+			if (err === 'token updated') {
+				try {
+					newCourses = await scrapePegaz()
+				} catch (err2) {
+					if (err === 'token updated') {
+						return resolve({ success: false, msg: 'token update failed' })
+					}
+					console.error(err2)
+					return resolve({ success: false, msg: 'token updated, scraping failed', err: err2 })
+				}
+			}
+			// other errors
+			else {
+				console.error(err)
+				return resolve({ success: false, msg: 'scraping failed', err })
+			}
+		}
+
+		// --- compare with previous ---
+
+		// no previus data
+		if (!config.download) {
+			config.updateDownload(newCourses)
+			return resolve({ success: true, msg: 'first download' })
+		}
+
+		let oldCourses = config.download
+
+		// detect adder or deleted courses
+		let newIdMap = newCourses.map((el) => el.id)
+		let oldIdMap = oldCourses.map((el) => el.id)
+		let addedCourseIds = _.difference(newIdMap, oldIdMap)
+		let deletedCourseIds = _.difference(oldIdMap, newIdMap)
+		let addedCourses = newCourses.filter((course) => addedCourseIds.includes(course.id))
+		let deletedCourses = oldCourses.filter((course) => deletedCourseIds.includes(course.id))
+
+		/** @type {Changes} */
+		const result = { added: addedCourses, removed: deletedCourses, changed: [] }
+
+		for (let course of newCourses) {
+			// skip new courses
+			if (addedCourseIds.includes(course.id)) continue
+			let isChanged = false
+
+			// compare old and new
+			let newCourse = _.cloneDeep(course)
+			let oldCourse = oldCourses.find((el) => el.id === newCourse.id)
+			for (let key of Object.keys(newCourse)) {
+				// for items with ids
+				if (['grades', 'files', 'announcements'].includes(key)) {
+					let newIds = newCourse[key].map((el) => el.id)
+					let oldIds = oldCourse[key].map((el) => el.id)
+
+					let addedIds = _.difference(newIds, oldIds)
+					let deletedIds = _.difference(oldIds, newIds)
+
+					let addedEls = newCourse[key].filter((el) => addedIds.includes(el.id))
+					let deletedEls = oldCourse[key].filter((el) => deletedIds.includes(el.id))
+					// existing elements with changed value or name
+					let changedEls = []
+					for (let newEl of newCourse[key]) {
+						if (addedIds.includes(newEl.id)) continue
+
+						let changedEl = { id: newEl.id, orig: newEl }
+						let oldEl = oldCourse[key].find((el) => el.id === newEl.id)
+						for (let key of Object.keys(newEl)) {
+							if (newEl[key] !== oldEl[key])
+								changedEl[key] = {
+									old: oldEl[key],
+									new: newEl[key],
+								}
 						}
-						console.error(err2)
-						return resolve({ success: false, msg: 'token updated, scraping failed', err: err2 })
+						if (Object.keys(changedEl).length > 2) {
+							changedEls.push(changedEl)
+						}
+					}
+
+					if (addedEls.length + deletedEls.length + changedEls.length > 0) {
+						if (!isChanged) {
+							isChanged = true
+							newCourse.changes = {}
+							result.changed.push(newCourse)
+						}
+						newCourse.changes[key] = {
+							added: addedEls,
+							removed: deletedEls,
+							changed: changedEls,
+						}
 					}
 				}
-				// other errors
+				// compare data arrays
+				else if (Array.isArray(newCourse[key])) {
+					let added = _.difference(newCourse[key], oldCourse[key])
+					let removed = _.difference(oldCourse[key], newCourse[key])
+					if (added.length + removed.length > 0) {
+						if (!isChanged) {
+							isChanged = true
+							newCourse.changes = {}
+							result.changed.push(newCourse)
+						}
+						newCourse.changes[key] = {
+							added,
+							removed,
+						}
+					}
+				}
+				// compare strings like course name
 				else {
-					console.error(err)
-					return resolve({ success: false, msg: 'scraping failed', err })
-				}
-			}
-
-			// --- compare with previous ---
-
-			// no previus data
-			if (!config.download) {
-				config.updateDownload(newCourses)
-				return resolve({ success: true, msg: 'first download' })
-			}
-
-			let oldCourses = config.download
-
-			// detect adder or deleted courses
-			let newIdMap = newCourses.map((el) => el.id)
-			let oldIdMap = oldCourses.map((el) => el.id)
-			let addedCourseIds = _.difference(newIdMap, oldIdMap)
-			let deletedCourseIds = _.difference(oldIdMap, newIdMap)
-			let addedCourses = newCourses.filter((course) => addedCourseIds.includes(course.id))
-			let deletedCourses = oldCourses.filter((course) => deletedCourseIds.includes(course.id))
-
-			/** @type {Changes} */
-			const result = { added: addedCourses, removed: deletedCourses, changed: [] }
-
-			for (let course of newCourses) {
-				// skip new courses
-				if (addedCourseIds.includes(course.id)) continue
-				let isChanged = false
-
-				// compare old and new
-				let newCourse = _.cloneDeep(course)
-				let oldCourse = oldCourses.find((el) => el.id === newCourse.id)
-				for (let key of Object.keys(newCourse)) {
-					// for items with ids
-					if (['grades', 'files', 'announcements'].includes(key)) {
-						let newIds = newCourse[key].map((el) => el.id)
-						let oldIds = oldCourse[key].map((el) => el.id)
-
-						let addedIds = _.difference(newIds, oldIds)
-						let deletedIds = _.difference(oldIds, newIds)
-
-						let addedEls = newCourse[key].filter((el) => addedIds.includes(el.id))
-						let deletedEls = oldCourse[key].filter((el) => deletedIds.includes(el.id))
-						// existing elements with changed value or name
-						let changedEls = []
-						for (let newEl of newCourse[key]) {
-							if (addedIds.includes(newEl.id)) continue
-
-							let changedEl = { id: newEl.id, orig: newEl }
-							let oldEl = oldCourse[key].find((el) => el.id === newEl.id)
-							for (let key of Object.keys(newEl)) {
-								if (newEl[key] !== oldEl[key])
-									changedEl[key] = {
-										old: oldEl[key],
-										new: newEl[key],
-									}
-							}
-							if (Object.keys(changedEl).length > 2) {
-								changedEls.push(changedEl)
-							}
+					if (newCourse[key] !== oldCourse[key]) {
+						if (!isChanged) {
+							isChanged = true
+							newCourse.changes = {}
+							result.changed.push(newCourse)
 						}
-
-						if (addedEls.length + deletedEls.length + changedEls.length > 0) {
-							if (!isChanged) {
-								isChanged = true
-								newCourse.changes = {}
-								result.changed.push(newCourse)
-							}
-							newCourse.changes[key] = {
-								added: addedEls,
-								removed: deletedEls,
-								changed: changedEls,
-							}
-						}
-					}
-					// compare data arrays
-					else if (Array.isArray(newCourse[key])) {
-						let added = _.difference(newCourse[key], oldCourse[key])
-						let removed = _.difference(oldCourse[key], newCourse[key])
-						if (added.length + removed.length > 0) {
-							if (!isChanged) {
-								isChanged = true
-								newCourse.changes = {}
-								result.changed.push(newCourse)
-							}
-							newCourse.changes[key] = {
-								added,
-								removed,
-							}
-						}
-					}
-					// compare strings like course name
-					else {
-						if (newCourse[key] !== oldCourse[key]) {
-							if (!isChanged) {
-								isChanged = true
-								newCourse.changes = {}
-								result.changed.push(newCourse)
-							}
-							newCourse.changes[key] = {
-								old: oldCourse[key],
-								new: newCourse[key],
-							}
+						newCourse.changes[key] = {
+							old: oldCourse[key],
+							new: newCourse[key],
 						}
 					}
 				}
 			}
-			if (result.added.length + result.removed.length + result.changed.length > 0) {
-				resolve({ success: true, msg: 'differences found', result })
-				config.updateDownload(newCourses)
-			} else {
-				resolve({ success: true, msg: 'no differences' })
-			}
-		})
-	},
+		}
+		if (result.added.length + result.removed.length + result.changed.length > 0) {
+			resolve({ success: true, msg: 'differences found', result })
+			config.updateDownload(newCourses)
+		} else {
+			resolve({ success: true, msg: 'no differences' })
+		}
+	})
 }
