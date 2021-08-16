@@ -9,7 +9,8 @@
 		"stop": "pm2 delete ecosystem.config.js",
 		"log": "pm2 log",
 		"monit": "pm2 monit",
-		"register": "node scripts/register.js"
+		"register": "node scripts/register.js",
+		"get-invite": "node scripts/get-invite.js"
 	},
 	"author": "ignis05",
 	"license": "ISC",
