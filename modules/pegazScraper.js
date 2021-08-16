@@ -1,5 +1,4 @@
 const { Scraper, Root, CollectContent, OpenLinks } = require('nodejs-web-scraper')
-const delay = require('delay')
 const puppeteer = require('puppeteer')
 const isWindows = require('os').platform() === 'win32'
 const _ = require('lodash')
@@ -187,8 +186,10 @@ function getNewToken() {
 		await page.keyboard.type(config.auth.password)
 		await page.click('input[name="submit"]')
 
+		// wait for redirect to complete
+		await page.waitForSelector('a.aalink.coursename', { visible: true, timeout: 0 })
+
 		// get pegaz cookies
-		await delay(2000)
 		const cookies = await page.cookies()
 
 		await browser.close()
