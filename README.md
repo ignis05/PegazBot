@@ -4,7 +4,8 @@ Nodejs web scraper that reports [pegaz](https://pegaz.uj.edu.pl) updates using d
 
 ## Setup
 
-Requires node.js `^16.6.1`.
+Requires [node.js](https://nodejs.org/en/) version `^16.6.1`.<br>
+(And **chromium-browser** package to run on linux)
 
 1. Install dependencies `npm install`
 2. Generate config files `node bot.js`
