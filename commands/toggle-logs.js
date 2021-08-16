@@ -1,4 +1,5 @@
 /** @typedef {import("discord.js").CommandInteraction} CommandInteraction */
+const config = require('../modules/config')
 
 module.exports = {
 	interaction: {
@@ -8,19 +9,12 @@ module.exports = {
 	},
 	/** @param {CommandInteraction} inter */
 	async handler(inter) {
-		inter.defer()
-
-		let newLogChannelID = inter.options[0].value
-		let lch = await client.channels.fetch(newLogChannelID)
-		if (!lch.isText()) return inter.editReply('Specified channel is not a text channel', { ephemeral: true })
-
-		if (logChannelID == newLogChannelID) {
-			return inter.editReply('This channel is already set as log channel', { ephemeral: true })
+		if (config.channels.log.includes(inter.channel.id)) {
+			if (config.channels.del(inter.channel.id, true)) inter.reply({ content: 'Disabled logs in this channel.', ephemeral: true })
+			else inter.reply({ content: 'Error: something went wrong', ephemeral: true })
+		} else {
+			if (config.channels.add(inter.channel.id, true)) inter.reply({ content: 'Enabled logs in this channel.', ephemeral: true })
+			else inter.reply({ content: 'Error: something went wrong', ephemeral: true })
 		}
-		logChannelID = newLogChannelID
-		fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID }, null, 2), (err) => {
-			if (err) console.error(err)
-		})
-		inter.editReply('Updated log channel.')
 	},
 }

@@ -1,4 +1,5 @@
 /** @typedef {import("discord.js").CommandInteraction} CommandInteraction */
+const config = require('../modules/config')
 
 module.exports = {
 	interaction: {
@@ -8,19 +9,12 @@ module.exports = {
 	},
 	/** @param {CommandInteraction} inter */
 	async handler(inter) {
-		inter.defer()
-
-		let newChannelID = inter.options[0].value
-		let ch = await client.channels.fetch(newChannelID)
-		if (!ch.isText()) return inter.editReply('Specified channel is not a text channel', { ephemeral: true })
-
-		if (channelID == newChannelID) {
-			return inter.editReply('This channel is already set as notification channel', { ephemeral: true })
+		if (config.channels.alert.includes(inter.channel.id)) {
+			if (config.channels.del(inter.channel.id)) inter.reply({ content: 'Disabled alerts in this channel.', ephemeral: true })
+			else inter.reply({ content: 'Error: something went wrong', ephemeral: true })
+		} else {
+			if (config.channels.add(inter.channel.id)) inter.reply({ content: 'Enabled alerts in this channel.', ephemeral: true })
+			else inter.reply({ content: 'Error: something went wrong', ephemeral: true })
 		}
-		channelID = newChannelID
-		fs.writeFile('./data/config.json', JSON.stringify({ channelID, logChannelID }, null, 2), (err) => {
-			if (err) console.error(err)
-		})
-		inter.editReply('Updated notification channel.')
 	},
 }

@@ -72,26 +72,36 @@ try {
  * Adds channel id to the alert list. log=true adds to log list instead
  * @param {Snowflake} id
  * @param {boolean} log
+ * @returns {boolean} true if saving was succesfull
  */
 channels.add = function (id, log = false) {
 	/** @type {Array} */
 	let channelsList = log ? channels.log : channels.alert
-	if (channelsList.includes(id)) return console.error(`trying to add existing channel ${id}`)
+	if (channelsList.includes(id)) {
+		console.error(`trying to add existing channel ${id}`)
+		return false
+	}
 	channelsList.push(id)
 	fs.writeFileSync('./data/channels.json', JSON.stringify(result.channels, null, 2))
+	return true
 }
 /**
  * Removes channel id from the alert list. log=true removes from log list instead
  * @param {Snowflake} id
  * @param {boolean} log
+ * @returns {boolean} true if saving was succesfull
  */
 channels.del = function (id, log = false) {
 	/** @type {Array} */
 	let channelsList = log ? channels.log : channels.alert
-	if (!channelsList.includes(id)) return console.error(`trying to remove not existing channel ${id}`)
+	if (!channelsList.includes(id)) {
+		console.error(`trying to remove not existing channel ${id}`)
+		return false
+	}
 	let index = channelsList.indexOf(id)
 	channelsList.splice(index, 1)
 	fs.writeFileSync('./data/channels.json', JSON.stringify(result.channels, null, 2))
+	return true
 }
 
 // pegaz download

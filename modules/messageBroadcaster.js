@@ -18,20 +18,20 @@ module.exports = function broadcastMsg(client, messageOptions, log = false) {
 		for (let id of channelList) {
 			/** @type {TextChannel} */
 			var channel = await client.channels.fetch(id).catch(console.error)
-			// fetchable guild text channel
-			if (!channel || channel.type !== 'GUILD_TEXT') {
+			// fetchable text channel
+			if (!channel || !channel.isText()) {
 				console.log(`removing ${id} from the list - invalid type or id`)
 				config.channels.del(id, log)
 				continue
 			}
 			// can send messages
-			if (!channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
+			if (channel.guild && !channel.permissionsFor(channel.guild.me).has('SEND_MESSAGES')) {
 				console.log(`removing ${id} from the list - no send msg perms`)
 				config.channels.del(id, log)
 				continue
 			}
 			// can send embed
-			if (!channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
+			if (channel.guild && !channel.permissionsFor(channel.guild.me).has('EMBED_LINKS')) {
 				channel.send(`Failed to send embeds to this channel.\nRemoving it from the list.`)
 				console.log(`removing ${id} from the list - no send embed perms`)
 				config.channels.del(id, log)
