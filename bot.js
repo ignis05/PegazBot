@@ -16,7 +16,7 @@ client.on('ready', async () => {
 })
 
 client.once('ready', () => {
-	// runWebScraper()
+	runWebScraper()
 	setInterval(runWebScraper, 900000)
 	// save client id for register script
 	fs.writeFileSync('./data/clientId.json', JSON.stringify({ clientId: client.user.id }))
