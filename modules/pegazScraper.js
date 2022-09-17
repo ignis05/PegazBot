@@ -5,6 +5,7 @@ const _ = require('lodash')
 const cheerio = require('cheerio')
 
 const config = require('./config')
+const { rejects } = require('assert')
 
 /**
  *
@@ -108,7 +109,7 @@ function scrapePegaz() {
 	return new Promise(async (resolve, reject) => {
 		const scraper = new Scraper({
 			baseSiteUrl: 'https://pegaz.uj.edu.pl',
-			startUrl: 'https://pegaz.uj.edu.pl/my',
+			startUrl: 'https://pegaz.uj.edu.pl/my/',
 			logPath: './logs',
 			cloneImages: true,
 			showConsoleLogs: false,
@@ -120,7 +121,7 @@ function scrapePegaz() {
 			filePath: null,
 			auth: null,
 			headers: {
-				Cookie: 'MoodleSession=' + config.moodleToken,
+				Cookie: `MoodleSession=${config.moodleToken}`,
 			},
 			proxy: null,
 		})
@@ -152,11 +153,13 @@ function scrapePegaz() {
 			.scrape(root)
 			.then(async () => {
 				// token expired and pegaz is redirecting to login page
-				if (root.getErrors()?.[0]?.includes('Error: maximum redirect reached')) {
-					console.log('redirect error - token might be expired')
+				let errors = root.getErrors()
+				if (errors?.[0]?.includes('Server responded with 400')) {
+					console.log('access error - token might be expired')
 					await getNewToken()
 					return reject('token updated')
 				}
+				if (errors.length) return reject(errors)
 
 				resolve(formatCourses(courses.getData()))
 			})
@@ -180,11 +183,11 @@ function getNewToken() {
 		await page.goto('https://pegaz.uj.edu.pl/my/')
 
 		// sign in
-		await page.focus('input[id="username"]')
+		await page.focus('input#userNameInput')
 		await page.keyboard.type(config.auth.login)
-		await page.focus('input[id="password"]')
+		await page.focus('input#passwordInput')
 		await page.keyboard.type(config.auth.password)
-		await page.click('input[name="submit"]')
+		await page.click('span#submitButton')
 
 		// wait for redirect to complete
 		await page.waitForSelector('a.aalink.coursename', { visible: true, timeout: 0 })
